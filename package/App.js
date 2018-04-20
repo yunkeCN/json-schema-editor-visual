@@ -31,6 +31,7 @@ const utils = require('./utils');
 import CustomItem from './components/SchemaComponents/SchemaOther.js';
 import LocalProvider from './components/LocalProvider/index.js';
 
+
 class jsonSchema extends React.Component {
   constructor(props) {
     super(props);
@@ -58,21 +59,16 @@ class jsonSchema extends React.Component {
       visible: true
     });
   };
-  handleOk = () => {    
+  handleOk = () => {
+    this.setState({ visible: false });
     if (this.importJsonType !== 'schema') {
-      if (!this.jsonData) {
-        return message.error('json 数据格式有误')
-      };
-      
+      if (!this.jsonData) return;
       let jsonData = GenerateSchema(this.jsonData);
       this.Model.changeEditorSchemaAction({value: jsonData});
     } else {
-      if (!this.jsonSchemaData){
-        return message.error('json 数据格式有误')
-      };      
+      if (!this.jsonSchemaData) return;
       this.Model.changeEditorSchemaAction({value: this.jsonSchemaData});
     }
-    this.setState({ visible: false });
   };
   handleCancel = () => {
     this.setState({ visible: false });
@@ -101,7 +97,7 @@ class jsonSchema extends React.Component {
     this.Model.changeEditorSchemaAction({value: JSON.parse(data)});
   }
 
-  
+
 
   getChildContext() {
     return {
@@ -114,9 +110,9 @@ class jsonSchema extends React.Component {
   }
 
   alterMsg =() => {
-    
+
       return message.error(LocalProvider('valid_json'));
-   
+
   }
 
   // AceEditor 中的数据
@@ -155,7 +151,7 @@ class jsonSchema extends React.Component {
     this.Model.addChildFieldAction({key: [key]});
     this.setState({ show: true });
   };
- 
+
   clickIcon = () => {
     this.setState({ show: !this.state.show });
   };
@@ -180,7 +176,7 @@ class jsonSchema extends React.Component {
   };
   showEdit = (prefix, name, value) => {
     let descriptionKey = [].concat(prefix, name);
-    
+
     let description = value;
     this.setState({
       editVisible: true,
@@ -236,7 +232,7 @@ class jsonSchema extends React.Component {
 
   render() {
     const { visible, editVisible, description, advVisible, type, checked } = this.state;
-
+    const commentField = [{name: '选择公用字段', value: '0'},{name: '公用字段1', value: '1'}, {name: '公用字段2', value: '2'}]
     let disabled =
       this.props.schema.type === 'object' || this.props.schema.type === 'array' ? false : true;
 
@@ -320,7 +316,7 @@ class jsonSchema extends React.Component {
           <Col span={this.props.showEditor ? 16 : 24} className="wrapper object-style">
             <Row type="flex" align="middle">
               <Col span={12} className="col-item name-item col-item-name">
-                <Row type="flex" justify="space-around" align="middle">
+                <Row type="flex">
                   <Col span={2} className="down-style-col">
                     {this.props.schema.type === 'object' ? (
                       <span className="down-style" onClick={this.clickIcon}>
@@ -340,7 +336,7 @@ class jsonSchema extends React.Component {
                   </Col>
                   <Col span={22}>
                     <Input
-                      addonAfter={
+                      addonBefore={
                         <Tooltip placement="top" title={LocalProvider('checked_all')}>
                           <Checkbox
                           checked={checked}
@@ -348,7 +344,7 @@ class jsonSchema extends React.Component {
                           onChange={e => this.changeCheckBox(e.target.checked)}
                         />
                         </Tooltip>
-                        
+
                       }
                       disabled
                       value="root"
@@ -402,6 +398,7 @@ class jsonSchema extends React.Component {
             {this.state.show && (
               <SchemaJson
                 data={this.props.schema}
+                commentField={commentField}
                 showEdit={this.showEdit}
                 showAdv={this.showAdv}
               />

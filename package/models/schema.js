@@ -28,7 +28,7 @@ export default {
     const value = action.value;
     let oldData = oldState.data;
     let parentKeys = utils.getParentKeys(keys);
-    let parentData = utils.getData(oldData, parentKeys);    
+    let parentData = utils.getData(oldData, parentKeys);
     let requiredData = [].concat(parentData.required || []);
     let propertiesData = utils.getData(oldData, keys);
     let newPropertiesData = {};
@@ -40,7 +40,7 @@ export default {
       delete state.open[oldOpenKeys];
       state.open[openKeys] = true;
     }
-   
+
     if (propertiesData[value] && typeof propertiesData[value] === 'object') {
       return;
     }
@@ -74,7 +74,7 @@ export default {
     let parentKeys = utils.getParentKeys(keys);
     let oldData = oldState.data;
     let parentData = utils.getData(oldData, parentKeys);
-    if (parentData.type === value) {
+    if (parentData.real === value) {
       return;
     }
     let newParentData = utils.defaultSchema[value];
