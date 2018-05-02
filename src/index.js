@@ -4,11 +4,11 @@ import { Provider } from 'react-redux';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import 'antd/dist/antd.css';
 
-if (process.env.NODE_ENV !== 'production') {
-  window.Perf = require('react-addons-perf');
-}
+// if (process.env.NODE_ENV !== 'production') {
+//   window.Perf = require('react-addons-perf');
+// }
 import '../dist/main.css'
-const jeditor = require('../dist/main.js');
+const jeditor = require('../package/index');
 
 
 // let name_SOURCE= [
@@ -724,7 +724,7 @@ render(
 
     <JEditor1
       showEditor={true}
-      data={''}
+      data={schema}
       onChange={e => {
         console.log('changeValue', e);
       }}
