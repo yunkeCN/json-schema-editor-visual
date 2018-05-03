@@ -7,7 +7,6 @@ import 'antd/dist/antd.css';
 // if (process.env.NODE_ENV !== 'production') {
 //   window.Perf = require('react-addons-perf');
 // }
-import '../dist/main.css'
 const jeditor = require('../package/index');
 
 
@@ -697,8 +696,40 @@ let schema = {
 };
 
 
-  schema = JSON.stringify(schema, null, '  ');
+schema = JSON.stringify(schema, null, '  ');
 
+const refSchemas = [
+  {
+    id: 'user',
+    name: 'User',
+    schema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string'
+        },
+        name: {
+          type: 'string'
+        },
+      },
+    }
+  },
+  {
+    id: 'product',
+    name: 'Product',
+    schema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string'
+        },
+        name: {
+          type: 'string'
+        },
+      },
+    }
+  }
+];
 render(
   <div>
     <a target="_blank" href="https://github.com/YMFE/json-schema-editor-visual">
@@ -728,6 +759,7 @@ render(
       onChange={e => {
         console.log('changeValue', e);
       }}
+      refSchemas={refSchemas}
     />
 
     {/* <JEditor2

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
   Input,
   Row,
@@ -109,10 +109,8 @@ class jsonSchema extends React.Component {
     };
   }
 
-  alterMsg =() => {
-
-      return message.error(LocalProvider('valid_json'));
-
+  alterMsg = () => {
+    return message.error(LocalProvider('valid_json'));
   }
 
   // AceEditor 中的数据
@@ -231,8 +229,15 @@ class jsonSchema extends React.Component {
   };
 
   render() {
-    const { visible, editVisible, description, advVisible, type, checked } = this.state;
-    const commentField = [{name: '选择公用字段', value: '0'},{name: '公用字段1', value: '1'}, {name: '公用字段2', value: '2'}]
+    const {
+      visible,
+      editVisible,
+      description,
+      advVisible,
+      type,
+      checked
+    } = this.state;
+
     let disabled =
       this.props.schema.type === 'object' || this.props.schema.type === 'array' ? false : true;
 
@@ -314,9 +319,9 @@ class jsonSchema extends React.Component {
             </Col>
           )}
           <Col span={this.props.showEditor ? 16 : 24} className="wrapper object-style">
-            <Row type="flex" align="middle">
+            <Row className="row" type="flex" align="middle">
               <Col span={12} className="col-item name-item col-item-name">
-                <Row type="flex">
+                <Row type="flex" justify="space-around" align="middle">
                   <Col span={2} className="down-style-col">
                     {this.props.schema.type === 'object' ? (
                       <span className="down-style" onClick={this.clickIcon}>
@@ -336,7 +341,7 @@ class jsonSchema extends React.Component {
                   </Col>
                   <Col span={22}>
                     <Input
-                      addonBefore={
+                      addonAfter={
                         <Tooltip placement="top" title={LocalProvider('checked_all')}>
                           <Checkbox
                           checked={checked}
@@ -356,7 +361,7 @@ class jsonSchema extends React.Component {
                 <Select
                   className="type-select-style"
                   onChange={e => this.changeType(`type`, e)}
-                  value={this.props.schema.type || 'object'}
+                  value={this.props.schema.type || 'ref'}
                 >
                   {SCHEMA_TYPE.map((item, index) => {
                     return (
@@ -367,38 +372,63 @@ class jsonSchema extends React.Component {
                   })}
                 </Select>
               </Col>
-              <Col span={5} className="col-item col-item-desc">
-                <Input
-                  addonAfter={
-                    <Icon
-                      type="edit"
-                      onClick={() => this.showEdit([], 'description', this.props.schema.description)}
+              {
+                typeof this.props.schema.$ref === 'undefined' && 
+                <Fragment>
+                  <Col span={5} className="col-item col-item-desc">
+                    <Input
+                      addonAfter={
+                        <Icon
+                          type="edit"
+                          onClick={() => this.showEdit([], 'description', this.props.schema.description)}
+                        />
+                      }
+                      placeholder={LocalProvider('description')}
+                      value={this.props.schema.description}
+                      onChange={e => this.changeValue(['description'], e.target.value)}
                     />
-                  }
-                  placeholder={LocalProvider('description')}
-                  value={this.props.schema.description}
-                  onChange={e => this.changeValue(['description'], e.target.value)}
-                />
-              </Col>
-              <Col span={3} className="col-item col-item-setting">
-                <span className="adv-set" onClick={() => this.showAdv([], this.props.schema)}>
-                  <Tooltip placement="top" title={LocalProvider('adv_setting')}>
-                    <Icon type="setting" />
-                  </Tooltip>
-                </span>
-                {this.props.schema.type === 'object' ? (
-                  <span onClick={() => this.addChildField('properties')}>
-                    <Tooltip placement="top" title={LocalProvider('add_child_node')}>
-                      <Icon type="plus" className="plus" />
-                    </Tooltip>
-                  </span>
-                ) : null}
-              </Col>
+                  </Col>
+                  <Col span={3} className="col-item col-item-setting">
+                    <span className="adv-set" onClick={() => this.showAdv([], this.props.schema)}>
+                      <Tooltip placement="top" title={LocalProvider('adv_setting')}>
+                        <Icon type="setting" />
+                      </Tooltip>
+                    </span>
+                    {this.props.schema.type === 'object' ? (
+                      <span onClick={() => this.addChildField('properties')}>
+                        <Tooltip placement="top" title={LocalProvider('add_child_node')}>
+                          <Icon type="plus" className="plus" />
+                        </Tooltip>
+                      </span>
+                    ) : null}
+                  </Col>
+                </Fragment>
+              }
+              {
+                typeof this.props.schema.$ref !== 'undefined' &&
+                <Col span={5} className="col-item col-item-type">
+                  <Select
+                    style={{ width: '100%' }}
+                    className="ref-select-style"
+                    onChange={e => this.changeValue(['$ref'], e)}
+                    value={this.props.schema.$ref}
+                  >
+                    {this.props.refSchemas.map((item, index) => {
+                      return (
+                        <Option value={this.props.refFunc(item)} key={index}>
+                          {item.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                </Col>
+              }
             </Row>
             {this.state.show && (
               <SchemaJson
                 data={this.props.schema}
-                commentField={commentField}
+                refSchemas={this.props.refSchemas}
+                refFunc={this.props.refFunc}
                 showEdit={this.showEdit}
                 showAdv={this.showAdv}
               />
@@ -420,8 +450,15 @@ jsonSchema.propTypes = {
   data: PropTypes.string,
   onChange: PropTypes.func,
   showEditor: PropTypes.bool,
-  Model: PropTypes.object
+  Model: PropTypes.object,
+  refSchemas: PropTypes.array,
+  refFunc: PropTypes.func,
 };
+
+jsonSchema.defaultProps = {
+  refFunc: (item) => `#components/schema/${item.name}`,
+  refSchemas: [],
+}
 
 export default connect(
     state => ({

@@ -6,13 +6,19 @@ import utils from './utils'
 import moox from 'moox'
 import schema from './models/schema'
 import PropTypes from 'prop-types'
+import { devToolsEnhancer } from 'redux-devtools-extension';
 
 module.exports = (config = {})=>{
   if(config.lang) utils.lang = config.lang;
   
-  const Model = moox({
-    schema
-  })
+  const Model = moox(
+    {
+      schema
+    },
+    {
+      enhancer: devToolsEnhancer()
+    }
+  )
   if(config.format){
     Model.__jsonSchemaFormat = config.format
   } else {
@@ -32,7 +38,9 @@ module.exports = (config = {})=>{
   Component.propTypes = {
     data: PropTypes.string,
     onChange: PropTypes.func,
-    showEditor: PropTypes.bool
+    showEditor: PropTypes.bool,
+    refSchemas: PropTypes.array,
+    refFunc: PropTypes.func,
   }
   return Component;
 

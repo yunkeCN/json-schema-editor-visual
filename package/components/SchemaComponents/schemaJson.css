@@ -1,7 +1,5 @@
-
-.json-schema-react-editor .option-formStyle{
-  /* padding-left: 25px; */
-  padding-Top: 8px
+.json-schema-react-editor .row {
+  padding-bottom: 10px;
 }
 
 .json-schema-react-editor .required-icon {
@@ -10,15 +8,6 @@
   font-weight: bold;
   padding-left: 5px
 }
-
-.json-schema-react-editor .object-style {
-  /* border-left: 2px dotted gray; */
-  /* padding-left: 8px; */
-  padding-top: 6px;
-  /* margin-left: 20px; */
-  margin-top: 8px;
-}
-
 
 
 .json-schema-react-editor .col-item-type{
@@ -45,10 +34,6 @@
 
 .json-schema-react-editor .close {
   color: #ff561b
-}
-
-.json-schema-react-editor .array-type {
-  margin-top: 8px;
 }
 
 .json-schema-react-editor .delete-item {

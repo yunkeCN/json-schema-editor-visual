@@ -11,40 +11,32 @@ exports.format = [
   {  name: 'uri' }
 ];
 const _ = require('underscore');
-exports.SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer', 'quote'];
+exports.SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer', 'ref'];
 exports.defaultSchema = {
   string: {
-    real: 'string',
     type: 'string'
   },
   number: {
-    real: 'number',
     type: 'number'
   },
   array: {
-    real: 'array',
     type: 'array',
     items: {
       type: 'string'
     }
   },
   object: {
-    real: 'object',
     type: 'object',
     properties: {}
   },
   boolean: {
-    real: 'boolean',
     type: 'boolean'
   },
   integer: {
-    real: 'integer',
     type: 'integer'
   },
-  quote: {
-    type: 'object',
-    real: 'quote',
-    properties: {}
+  ref: {
+    $ref: ''
   }
 };
 

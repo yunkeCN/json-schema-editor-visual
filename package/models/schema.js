@@ -74,7 +74,7 @@ export default {
     let parentKeys = utils.getParentKeys(keys);
     let oldData = oldState.data;
     let parentData = utils.getData(oldData, parentKeys);
-    if (parentData.real === value) {
+    if (parentData.type === value) {
       return;
     }
     let newParentData = utils.defaultSchema[value];
