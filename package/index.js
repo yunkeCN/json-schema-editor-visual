@@ -15,9 +15,9 @@ module.exports = (config = {})=>{
     {
       schema
     },
-    {
-      enhancer: devToolsEnhancer()
-    }
+    // {
+    //   enhancer: devToolsEnhancer()
+    // }
   )
   if(config.format){
     Model.__jsonSchemaFormat = config.format
