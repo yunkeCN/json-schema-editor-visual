@@ -6,7 +6,6 @@ import {
   Input,
   Row,
   Col,
-  Form,
   Select,
   Checkbox,
   Icon,
@@ -20,11 +19,8 @@ import PropTypes from 'prop-types';
 
 import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils';
 import LocaleProvider from '../LocalProvider/index';
-import utils from '../../utils';
 
-const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-const InputGroup = Input.Group;
 
 const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   switch (data.type) {
@@ -188,22 +184,18 @@ class SchemaArray extends PureComponent {
             }
             <Col span={3} className="col-item col-item-setting">
               <Tooltip
-                className="adv-set"
-                onClick={this.handleShowAdv}
                 placement="top"
                 title={LocaleProvider('adv_setting')}
               >
-                <Icon type="setting" />
+                <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
               </Tooltip>
-
               {
                 items.type === 'object' &&
                 <Tooltip
-                  onClick={this.handleAddChildField}
                   placement="top"
                   title={LocaleProvider('add_child_node')}
                 >
-                  <Icon type="plus" className="plus" />
+                  <Icon onClick={this.handleAddChildField} type="plus" className="plus" />
                 </Tooltip>
               }
             </Col>
@@ -410,15 +402,20 @@ class SchemaItem extends PureComponent {
           }
           <Col span={3} className="col-item col-item-setting">
             <Icon type="close" className="close delete-item" onClick={this.handleDeleteItem} />
+            <Tooltip
+              placement="top"
+              title={LocaleProvider('adv_setting')}
+            >
+              <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
+            </Tooltip>
             {value.type === 'object' ?
               <DropPlus prefix={prefix} name={name} />
               :
               <Tooltip
-                onClick={this.handleAddField}
                 placement="top"
                 title={LocaleProvider('add_sibling_node')}
               >
-                <Icon type="plus" className="plus" />
+                <Icon onClick={this.handleAddField} type="plus" className="plus" />
               </Tooltip>
             }
           </Col>
