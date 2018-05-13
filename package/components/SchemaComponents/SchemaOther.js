@@ -1,30 +1,25 @@
 import React, { PureComponent } from 'react';
 import {
-  Dropdown,
-  Menu,
   Input,
   InputNumber,
   Row,
   Col,
-  Form,
   Select,
   Checkbox,
-  Button,
   Icon,
-  Modal,
-  message,
   Tooltip,
-  Switch
+  Switch,
 } from 'antd';
-const { TextArea } = Input;
 import './schemaJson.css';
 import _ from 'underscore';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils.js';
-const Option = Select.Option;
-import AceEditor from '../AceEditor/AceEditor.js';
-import LocalProvider from '../LocalProvider/index.js';
+
+import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils';
+import AceEditor from '../AceEditor/AceEditor';
+import LocalProvider from '../LocalProvider/index';
+
+const { TextArea } = Input;
+const { Option } = Select;
 
 const changeOtherValue = (value, name, data, change) => {
   data[name] = value;
@@ -32,12 +27,10 @@ const changeOtherValue = (value, name, data, change) => {
 };
 
 class SchemaString extends PureComponent {
-  
-
   constructor(props, context) {
     super(props);
     this.state = {
-      checked: _.isUndefined(props.data.enum) ? false : true
+      checked: !_.isUndefined(props.data.enum),
     };
     this.format = context.Model.__jsonSchemaFormat;
   }
@@ -45,7 +38,7 @@ class SchemaString extends PureComponent {
   componentWillReceiveProps(nextprops) {
     if (this.props.data.enum !== nextprops.data.enum) {
       this.setState({
-        checked: _.isUndefined(nextprops.data.enum) ? false : true
+        checked: !_.isUndefined(nextprops.data.enum),
       });
     }
   }
@@ -56,19 +49,19 @@ class SchemaString extends PureComponent {
   };
 
   changeEnumOtherValue = (value, data) => {
-    var arr = value.split('\n');
+    let arr = value.split('\n');
     if (arr.length === 0 || (arr.length == 1 && !arr[0])) {
-      return;
+
     } else {
       data.enum = arr;
       this.context.changeCustomValue(data);
     }
   };
 
-  onChangeCheckBox = e => {
+  onChangeCheckBox = (e) => {
     console.log(e);
     this.setState({
-      checked: e.target.checked
+      checked: e.target.checked,
     });
   };
 
@@ -150,7 +143,7 @@ class SchemaString extends PureComponent {
               disabled={!this.state.checked}
               placeholder={LocalProvider('enum_msg')}
               autosize={{ minRows: 2, maxRows: 6 }}
-              onChange={e => {
+              onChange={(e) => {
                 this.changeEnumOtherValue(e.target.value, data);
               }}
             />
@@ -170,18 +163,13 @@ class SchemaString extends PureComponent {
               optionFilterProp="children"
               optionLabelProp="value"
               onChange={e => this.changeOtherValue(e, 'format', data)}
-              filterOption={(input, option) => {
-                
-                return option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-              }}
+              filterOption={(input, option) => option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              {this.format.map(item => {
-                return (
-                  <Option value={item.name} key={item.name}>
-                    {item.name} <span className="format-items-title">{item.title}</span>
-                  </Option>
-                );
-              })}
+              {this.format.map(item => (
+                <Option value={item.name} key={item.name}>
+                  {item.name} <span className="format-items-title">{item.title}</span>
+                </Option>
+              ))}
             </Select>
           </Col>
         </Row>
@@ -191,7 +179,7 @@ class SchemaString extends PureComponent {
 }
 SchemaString.contextTypes = {
   changeCustomValue: PropTypes.func,
-  Model: PropTypes.object
+  Model: PropTypes.object,
 };
 
 const SchemaNumber = (props, context) => {
@@ -295,12 +283,12 @@ const SchemaNumber = (props, context) => {
 };
 
 SchemaNumber.contextTypes = {
-  changeCustomValue: PropTypes.func
+  changeCustomValue: PropTypes.func,
 };
 
 const SchemaBoolean = (props, context) => {
   const { data } = props;
-  let value = _.isUndefined(data.default) ? '' : data.default ? 'true' : 'false';
+  const value = _.isUndefined(data.default) ? '' : data.default ? 'true' : 'false';
   return (
     <div>
       <div className="default-setting">{LocalProvider('base_setting')}</div>
@@ -313,10 +301,10 @@ const SchemaBoolean = (props, context) => {
             value={value}
             onChange={e =>
               changeOtherValue(
-                e === 'true' ? true : false,
+                e === 'true',
                 'default',
                 data,
-                context.changeCustomValue
+                context.changeCustomValue,
               )
             }
             style={{ width: 200 }}
@@ -331,7 +319,7 @@ const SchemaBoolean = (props, context) => {
 };
 
 SchemaBoolean.contextTypes = {
-  changeCustomValue: PropTypes.func
+  changeCustomValue: PropTypes.func,
 };
 
 const SchemaArray = (props, context) => {
@@ -392,18 +380,16 @@ const SchemaArray = (props, context) => {
 };
 
 SchemaArray.contextTypes = {
-  changeCustomValue: PropTypes.func
+  changeCustomValue: PropTypes.func,
 };
 
-const mapping = data => {
-  return {
-    string: <SchemaString data={data} />,
-    number: <SchemaNumber data={data} />,
-    boolean: <SchemaBoolean data={data} />,
-    integer: <SchemaNumber data={data} />,
-    array: <SchemaArray data={data} />
-  }[data.type];
-};
+const mapping = data => ({
+  string: <SchemaString data={data} />,
+  number: <SchemaNumber data={data} />,
+  boolean: <SchemaBoolean data={data} />,
+  integer: <SchemaNumber data={data} />,
+  array: <SchemaArray data={data} />,
+}[data.type]);
 
 const handleInputEditor = (e, change) => {
   if (!e.text) return;
@@ -428,7 +414,7 @@ const CustomItem = (props, context) => {
 };
 
 CustomItem.contextTypes = {
-  changeCustomValue: PropTypes.func
+  changeCustomValue: PropTypes.func,
 };
 
 export default CustomItem;

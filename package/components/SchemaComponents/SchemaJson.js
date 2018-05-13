@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { Component, PureComponent, Fragment } from 'react';
 import {
   Dropdown,
@@ -8,23 +9,22 @@ import {
   Form,
   Select,
   Checkbox,
-  Button,
   Icon,
-  Modal,
   message,
-  Tooltip
+  Tooltip,
 } from 'antd';
-const FormItem = Form.Item;
-const Option = Select.Option;
-const { TextArea } = Input;
 import './schemaJson.css';
 import _ from 'underscore';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils.js';
-const InputGroup = Input.Group;
-import LocaleProvider from '../LocalProvider/index.js';
+
+import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils';
+import LocaleProvider from '../LocalProvider/index';
 import utils from '../../utils';
+
+const FormItem = Form.Item;
+const { Option, OptGroup } = Select;
+const InputGroup = Input.Group;
 
 const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   switch (data.type) {
@@ -32,7 +32,7 @@ const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
       return <SchemaArray prefix={name} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
       break;
     case 'object':
-      let nameArray = [].concat(name, 'properties');
+      const nameArray = [].concat(name, 'properties');
       return <SchemaObject prefix={nameArray} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
       break;
     default:
@@ -40,9 +40,7 @@ const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   }
 };
 
-
 class SchemaArray extends PureComponent {
-
   constructor(props, context) {
     super(props);
     this._tagPaddingLeftStyle = {};
@@ -51,9 +49,9 @@ class SchemaArray extends PureComponent {
 
   componentWillMount() {
     const { prefix } = this.props;
-    let length = prefix.filter(name => name != 'properties').length;
+    const length = prefix.filter(name => name != 'properties').length;
     this.__tagPaddingLeftStyle = {
-      paddingLeft: `${20 * (length + 1)}px`
+      paddingLeft: `${20 * (length + 1)}px`,
     };
   }
 
@@ -62,44 +60,50 @@ class SchemaArray extends PureComponent {
   }
 
   // 修改数据类型
-  handleChangeType = value => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, 'type');
-    this.Model.changeTypeAction({key, value});
+  handleChangeTypeOrRef = (value) => {
+    const isRef = /^ref:/.test(value);
+
+    if (isRef) {
+      // eslint-disable-next-line no-param-reassign
+      value = value.replace(/^ref:/, '');
+    }
+
+    const prefix = this.getPrefix();
+
+    if (isRef) {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
+    } else {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
+    }
   };
 
   // 修改备注信息
-  handleChangeValue = e => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, `description`)
-    let value = e.target.value
-    this.Model.changeValueAction({key, value});
-  };
-
-  handleChangeRef = e => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, `$ref`)
-    this.Model.changeValueAction({ key, value:e });
+  handleChangeValue = (e) => {
+    const prefix = this.getPrefix();
+    const key = [].concat(prefix, 'description');
+    const { value } = e.target;
+    this.Model.changeValueAction({ key, value });
   };
 
   // 增加子节点
   handleAddChildField = () => {
-    let prefix = this.getPrefix();
-    let keyArr = [].concat(prefix, 'properties');
-    this.Model.addChildFieldAction({key:keyArr});
-    this.Model.setOpenValueAction({key: keyArr, value: true});
+    const prefix = this.getPrefix();
+    const keyArr = [].concat(prefix, 'properties');
+    this.Model.addChildFieldAction({ key: keyArr });
+    this.Model.setOpenValueAction({ key: keyArr, value: true });
   };
 
   handleClickIcon = () => {
-    let prefix = this.getPrefix();
+    const prefix = this.getPrefix();
     // 数据存储在 properties.name.properties下
-    let keyArr = [].concat(prefix, 'properties');
-    this.Model.setOpenValueAction({key: keyArr});
+    const keyArr = [].concat(prefix, 'properties');
+    this.Model.setOpenValueAction({ key: keyArr });
   };
 
   handleShowEdit = () => {
-    let prefix = this.getPrefix();
-    this.props.showEdit(prefix, `description`, this.props.data.items.description);
+    const prefix = this.getPrefix();
+    this.props.showEdit(prefix, 'description', this.props.data.items.description);
   };
 
   handleShowAdv = () => {
@@ -107,12 +111,14 @@ class SchemaArray extends PureComponent {
   };
 
   render() {
-    const { data, prefix, showEdit, showAdv, refSchemas, refFunc } = this.props;
-    const items = data.items;
-    let prefixArray = [].concat(prefix, 'items');
+    const {
+      data, prefix, showEdit, showAdv, refSchemas, refFunc
+    } = this.props;
+    const { items } = data;
+    const prefixArray = [].concat(prefix, 'items');
 
-    let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
-    let showIcon = this.context.getOpenValue([prefixArrayStr]);
+    const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
+    const showIcon = this.context.getOpenValue([prefixArrayStr]);
     return (
       !_.isUndefined(data.items) && (
         <div className="array-type">
@@ -129,8 +135,8 @@ class SchemaArray extends PureComponent {
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
                       ) : (
-                        <Icon className="icon-object" type="caret-right" />
-                      )}
+                          <Icon className="icon-object" type="caret-right" />
+                        )}
                     </span>
                   ) : null}
                 </Col>
@@ -141,70 +147,66 @@ class SchemaArray extends PureComponent {
             </Col>
             <Col span={4} className="col-item col-item-type">
               <Select
-                name="itemtype"
+                showSearch
                 className="type-select-style"
-                onChange={this.handleChangeType}
-                value={items.type || 'ref'}
+                onChange={this.handleChangeTypeOrRef}
+                value={items.type || `ref:${items.$ref}`}
+                filterOption={(input, option) => (
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                )}
               >
-                {SCHEMA_TYPE.map((item, index) => {
-                  return (
-                    <Option value={item} key={index}>
+                <OptGroup label="Basic">
+                  {SCHEMA_TYPE.map(item => (
+                    <Option value={item} key={item}>
                       {item}
                     </Option>
-                  );
-                })}
+                  ))}
+                </OptGroup>
+                <OptGroup label="Ref">
+                  {refSchemas.map(item => (
+                    <Option value={`ref:${refFunc(item)}`} key={item}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </OptGroup>
               </Select>
             </Col>
             {
               typeof items.$ref === 'undefined' &&
-              <Fragment>
-                <Col span={5} className="col-item col-item-desc">
-                  <Input
-                    addonAfter={<Icon type="edit" onClick={this.handleShowEdit} />}
-                    placeholder={LocaleProvider('description')}
-                    value={items.description}
-                    onChange={this.handleChangeValue}
-                  />
-                </Col>
-                <Col span={3} className="col-item col-item-setting">
-                  <span className="adv-set" onClick={this.handleShowAdv}>
-                    <Tooltip placement="top" title={LocaleProvider('adv_setting')}>
-                      <Icon type="setting" />
-                    </Tooltip>
-                  </span>
-
-                  {items.type === 'object' ? (
-                    <span onClick={this.handleAddChildField}>
-                      <Tooltip placement="top" title={LocaleProvider('add_child_node')}>
-                        <Icon type="plus" className="plus" />
-                      </Tooltip>
-                    </span>
-                  ) : null}
-                </Col>
-              </Fragment>
+              <Col span={5} className="col-item col-item-desc">
+                <Input
+                  addonAfter={<Icon type="edit" onClick={this.handleShowEdit} />}
+                  placeholder={LocaleProvider('description')}
+                  value={items.description}
+                  onChange={this.handleChangeValue}
+                />
+              </Col>
             }
             {
               typeof items.$ref !== 'undefined' &&
-              <Fragment>
-                <Col span={5} className="col-item col-item-type">
-                  <Select
-                    style={{ width: '100%' }}
-                    className="ref-select-style"
-                    onChange={e => this.handleChangeRef(e)}
-                    value={items.$ref}
-                  >
-                    {refSchemas.map((item, index) => {
-                      return (
-                        <Option value={refFunc(item)} key={index}>
-                          {item.name}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </Col>
-                <Col span={3} />
-              </Fragment>
+              <Col span={5} className="col-item col-item-type" />
             }
+            <Col span={3} className="col-item col-item-setting">
+              <Tooltip
+                className="adv-set"
+                onClick={this.handleShowAdv}
+                placement="top"
+                title={LocaleProvider('adv_setting')}
+              >
+                <Icon type="setting" />
+              </Tooltip>
+
+              {
+                items.type === 'object' &&
+                <Tooltip
+                  onClick={this.handleAddChildField}
+                  placement="top"
+                  title={LocaleProvider('add_child_node')}
+                >
+                  <Icon type="plus" className="plus" />
+                </Tooltip>
+              }
+            </Col>
           </Row>
           <div className="option-formStyle">{mapping(prefixArray, items, showEdit, showAdv, refSchemas, refFunc)}</div>
         </div>
@@ -213,13 +215,12 @@ class SchemaArray extends PureComponent {
   }
 }
 
-SchemaArray.contextTypes={
+SchemaArray.contextTypes = {
   getOpenValue: PropTypes.func,
-  Model: PropTypes.object
-}
+  Model: PropTypes.object,
+};
 
 class SchemaItem extends PureComponent {
-
   constructor(props, context) {
     super(props);
     this._tagPaddingLeftStyle = {};
@@ -229,9 +230,9 @@ class SchemaItem extends PureComponent {
 
   componentWillMount() {
     const { prefix } = this.props;
-    let length = prefix.filter(name => name != 'properties').length;
+    const length = prefix.filter(name => name != 'properties').length;
     this.__tagPaddingLeftStyle = {
-      paddingLeft: `${20 * (length + 1)}px`
+      paddingLeft: `${20 * (length + 1)}px`,
     };
   }
 
@@ -240,51 +241,56 @@ class SchemaItem extends PureComponent {
   }
 
   // 修改节点字段名
-  handleChangeName = e => {
+  handleChangeName = (e) => {
     const { data, prefix, name } = this.props;
-    let value = e.target.value;
+    const value = e.target.value;
 
     if (data.properties[value] && typeof data.properties[value] === 'object') {
       return message.error(`The field "${value}" already exists.`);
     }
 
-    this.Model.changeNameAction({value, prefix, name});
+    this.Model.changeNameAction({ value, prefix, name });
   };
 
- // 修改备注信息
-  handleChangeDesc = e => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, 'description');
-    let value = e.target.value;
-    this.Model.changeValueAction({key, value});
+  // 修改备注信息
+  handleChangeDesc = (e) => {
+    const prefix = this.getPrefix();
+    const key = [].concat(prefix, 'description');
+    const { value } = e.target;
+    this.Model.changeValueAction({ key, value });
   };
 
   // 修改数据类型
-  handleChangeType = e => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, 'type');
-    this.Model.changeTypeAction({key, value: e});
-  };
+  handleChangeTypeOrRef = (value) => {
+    const isRef = /^ref:/.test(value);
 
-  // 修改ref字段
-  handleChangeRef = e => {
-    let prefix = this.getPrefix();
-    let key = [].concat(prefix, '$ref');
-    this.Model.changeValueAction({key, value: e});
-  }
+    if (isRef) {
+      // eslint-disable-next-line no-param-reassign
+      value = value.replace(/^ref:/, '');
+    }
+
+    const prefix = this.getPrefix();
+
+    if (isRef) {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
+    } else {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
+    }
+  };
 
   // 删除节点
   handleDeleteItem = () => {
     const { prefix, name } = this.props;
-    let nameArray = this.getPrefix();
-    this.Model.deleteItemAction({key: nameArray});
-    this.Model.enableRequireAction({prefix, name, required: false});
+    const nameArray = this.getPrefix();
+    this.Model.deleteItemAction({ key: nameArray });
+    this.Model.enableRequireAction({ prefix, name, required: false });
   };
 
   // 展示备注编辑弹窗
   handleShowEdit = () => {
     const { data, name, showEdit } = this.props;
-    showEdit(this.getPrefix(), `description`, data.properties[name].description);
+    showEdit(this.getPrefix(), 'description', data.properties[name].description);
   };
 
   // 展示高级设置弹窗
@@ -296,33 +302,35 @@ class SchemaItem extends PureComponent {
   //  增加子节点
   handleAddField = () => {
     const { prefix, name } = this.props;
-    this.Model.addFieldAction({prefix, name});
+    this.Model.addFieldAction({ prefix, name });
   };
 
-   // 控制三角形按钮
+  // 控制三角形按钮
   handleClickIcon = () => {
-    let prefix = this.getPrefix();
+    const prefix = this.getPrefix();
     // 数据存储在 properties.xxx.properties 下
-    let keyArr = [].concat(prefix, 'properties');
-    this.Model.setOpenValueAction({key: keyArr});
+    const keyArr = [].concat(prefix, 'properties');
+    this.Model.setOpenValueAction({ key: keyArr });
   };
 
-   // 修改是否必须
-  handleEnableRequire = e => {
+  // 修改是否必须
+  handleEnableRequire = (e) => {
     const { prefix, name } = this.props;
-    let required = e.target.checked
+    const required = e.target.checked;
     // this.enableRequire(this.props.prefix, this.props.name, e.target.checked);
-    this.Model.enableRequireAction({prefix, name, required});
+    this.Model.enableRequireAction({ prefix, name, required });
   };
 
   render() {
-    let { name, data, prefix, showEdit, showAdv, refSchemas, refFunc } = this.props;
-    let value = data.properties[name];
-    let prefixArray = [].concat(prefix, name);
-    let prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
-    let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
-    let show = this.context.getOpenValue([prefixStr]);
-    let showIcon = this.context.getOpenValue([prefixArrayStr]);
+    const {
+      name, data, prefix, showEdit, showAdv, refSchemas, refFunc
+    } = this.props;
+    const value = data.properties[name];
+    const prefixArray = [].concat(prefix, name);
+    const prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
+    const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
+    const show = this.context.getOpenValue([prefixStr]);
+    const showIcon = this.context.getOpenValue([prefixArrayStr]);
     return show ? (
       <div>
         <Row className="row" type="flex" justify="space-around" align="middle">
@@ -338,8 +346,8 @@ class SchemaItem extends PureComponent {
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
                     ) : (
-                      <Icon className="icon-object" type="caret-right" />
-                    )}
+                        <Icon className="icon-object" type="caret-right" />
+                      )}
                   </span>
                 ) : null}
               </Col>
@@ -361,68 +369,59 @@ class SchemaItem extends PureComponent {
           </Col>
           <Col span={4} className="col-item col-item-type">
             <Select
+              showSearch
               className="type-select-style"
-              onChange={this.handleChangeType}
-              value={value.type || 'ref'}
+              onChange={this.handleChangeTypeOrRef}
+              value={value.type || `ref:${value.$ref}`}
+              filterOption={(input, option) => (
+                option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              )}
             >
-              {SCHEMA_TYPE.map((item, index) => {
-                return (
-                  <Option value={item} key={index}>
+              <OptGroup label="Basic">
+                {SCHEMA_TYPE.map(item => (
+                  <Option value={item} key={item}>
                     {item}
                   </Option>
-                );
-              })}
+                ))}
+              </OptGroup>
+              <OptGroup label="Ref">
+                {refSchemas.map(item => (
+                  <Option value={`ref:${refFunc(item)}`} key={item}>
+                    {item.name}
+                  </Option>
+                ))}
+              </OptGroup>
             </Select>
           </Col>
           {
             typeof value.$ref === 'undefined' &&
-            <Fragment>
-              <Col span={5} className="col-item col-item-desc">
-                <Input
-                  addonAfter={<Icon type="edit" onClick={this.handleShowEdit} />}
-                  placeholder={LocaleProvider('description')}
-                  value={value.description}
-                  onChange={this.handleChangeDesc}
-                />
-              </Col>
-              <Col span={3} className="col-item col-item-setting">
-                <span className="delete-item" onClick={this.handleDeleteItem}>
-                  <Icon type="close" className="close" />
-                </span>
-                {value.type === 'object' ? (
-                  <DropPlus prefix={prefix} name={name} />
-                ) : (
-                    <span onClick={this.handleAddField}>
-                      <Tooltip placement="top" title={LocaleProvider('add_sibling_node')}>
-                        <Icon type="plus" className="plus" />
-                      </Tooltip>
-                    </span>
-                  )}
-              </Col>    
-            </Fragment>
+            <Col span={5} className="col-item col-item-desc">
+              <Input
+                addonAfter={<Icon type="edit" onClick={this.handleShowEdit} />}
+                placeholder={LocaleProvider('description')}
+                value={value.description}
+                onChange={this.handleChangeDesc}
+              />
+            </Col>
           }
           {
             typeof value.$ref !== 'undefined' &&
-            <Fragment>
-              <Col span={5} className="col-item col-item-type">
-                <Select
-                  style={{ width: '100%' }}
-                  className="ref-select-style"
-                  onChange={e => this.handleChangeRef(e)}
-                  value={value.$ref}
-                >
-                  {refSchemas.map((item, index) => {
-                    return (
-                      <Option value={refFunc(item)} key={index}>
-                        {item.name}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </Col>
-              <Col span={3}/>
-            </Fragment>
+            <Col span={5} className="col-item col-item-type"/>
           }
+          <Col span={3} className="col-item col-item-setting">
+            <Icon type="close" className="close delete-item" onClick={this.handleDeleteItem} />
+            {value.type === 'object' ?
+              <DropPlus prefix={prefix} name={name} />
+              :
+              <Tooltip
+                onClick={this.handleAddField}
+                placement="top"
+                title={LocaleProvider('add_sibling_node')}
+              >
+                <Icon type="plus" className="plus" />
+              </Tooltip>
+            }
+          </Col>
         </Row>
         <div className="option-formStyle">{mapping(prefixArray, value, showEdit, showAdv, refSchemas, refFunc)}</div>
       </div>
@@ -430,10 +429,10 @@ class SchemaItem extends PureComponent {
   }
 }
 
-SchemaItem.contextTypes={
+SchemaItem.contextTypes = {
   getOpenValue: PropTypes.func,
-  Model: PropTypes.object
-}
+  Model: PropTypes.object,
+};
 
 class SchemaObjectComponent extends Component {
   shouldComponentUpdate(nextProps) {
@@ -448,7 +447,9 @@ class SchemaObjectComponent extends Component {
   }
 
   render() {
-    const { data, prefix, showEdit, showAdv, refSchemas, refFunc } = this.props;
+    const {
+      data, prefix, showEdit, showAdv, refSchemas, refFunc
+    } = this.props;
     return (
       <div className="object-style1">
         {Object.keys(data.properties).map((name, index) => (
@@ -469,8 +470,8 @@ class SchemaObjectComponent extends Component {
 }
 
 const SchemaObject = connect(state => ({
-  open: state.schema.open
-}))(SchemaObjectComponent)
+  open: state.schema.open,
+}))(SchemaObjectComponent);
 
 const DropPlus = (props, context) => {
   const { prefix, name, add } = props;
@@ -478,15 +479,16 @@ const DropPlus = (props, context) => {
   const menu = (
     <Menu>
       <Menu.Item>
-        <span onClick={() => Model.addFieldAction({prefix, name})}>
+        <span onClick={() => Model.addFieldAction({ prefix, name })}>
           {LocaleProvider('sibling_node')}
         </span>
       </Menu.Item>
       <Menu.Item>
         <span onClick={() => {
           Model.setOpenValueAction({ key: [].concat(prefix, name, 'properties'), value: true });
-          Model.addChildFieldAction({key: [].concat(prefix, name, 'properties')})}
-          }
+          Model.addChildFieldAction({ key: [].concat(prefix, name, 'properties') });
+        }
+        }
         >
           {LocaleProvider('child_node')}
         </span>
@@ -503,11 +505,11 @@ const DropPlus = (props, context) => {
   );
 };
 
-DropPlus.contextTypes={
-  Model: PropTypes.object
-}
+DropPlus.contextTypes = {
+  Model: PropTypes.object,
+};
 
-const SchemaJson = props => {
+const SchemaJson = (props) => {
   const item = mapping([], props.data, props.showEdit, props.showAdv, props.refSchemas, props.refFunc);
   return <div className="schema-content">{item}</div>;
 };

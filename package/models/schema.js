@@ -1,7 +1,9 @@
-const _ = require('underscore');
 import utils from '../utils';
+import handleSchema from '../schema';
+
+const _ = require('underscore');
+
 let fieldNum = 1;
-import handleSchema from '../schema.js'
 
 export default {
   state: {
@@ -10,33 +12,33 @@ export default {
       title: '',
       type: 'object',
       properties: {},
-      required: []
+      required: [],
     },
     open: {
-      properties: true
-    }
+      properties: true,
+    },
   },
 
-  changeEditorSchemaAction: function (state, action) {
-    handleSchema(action.value)
+  changeEditorSchemaAction(state, action) {
+    handleSchema(action.value);
     state.data = action.value;
   },
 
-  changeNameAction: function (state, action, oldState) {
+  changeNameAction(state, action, oldState) {
     const keys = action.prefix;
     const name = action.name;
     const value = action.value;
-    let oldData = oldState.data;
-    let parentKeys = utils.getParentKeys(keys);
-    let parentData = utils.getData(oldData, parentKeys);
+    const oldData = oldState.data;
+    const parentKeys = utils.getParentKeys(keys);
+    const parentData = utils.getData(oldData, parentKeys);
     let requiredData = [].concat(parentData.required || []);
-    let propertiesData = utils.getData(oldData, keys);
-    let newPropertiesData = {};
+    const propertiesData = utils.getData(oldData, keys);
+    const newPropertiesData = {};
 
-    let curData = propertiesData[name]
-    let openKeys = [].concat(keys, value, 'properties').join(utils.JSONPATH_JOIN_CHAR)
-    let oldOpenKeys = [].concat(keys,name, 'properties').join(utils.JSONPATH_JOIN_CHAR)
-    if(curData.properties){
+    const curData = propertiesData[name];
+    const openKeys = [].concat(keys, value, 'properties').join(utils.JSONPATH_JOIN_CHAR);
+    const oldOpenKeys = [].concat(keys, name, 'properties').join(utils.JSONPATH_JOIN_CHAR);
+    if (curData.properties) {
       delete state.open[oldOpenKeys];
       state.open[openKeys] = true;
     }
@@ -45,7 +47,7 @@ export default {
       return;
     }
 
-    requiredData = requiredData.map(item => {
+    requiredData = requiredData.map((item) => {
       if (item === name) return value;
       return item;
     });
@@ -53,7 +55,7 @@ export default {
     parentKeys.push('required');
     utils.setData(state.data, parentKeys, requiredData);
 
-    for (let i in propertiesData) {
+    for (const i in propertiesData) {
       if (i === name) {
         newPropertiesData[value] = propertiesData[i];
       } else newPropertiesData[i] = propertiesData[i];
@@ -62,33 +64,36 @@ export default {
     utils.setData(state.data, keys, newPropertiesData);
   },
 
-  changeValueAction: function (state, action) {
+  changeValueAction(state, action) {
     const keys = action.key;
     utils.setData(state.data, keys, action.value);
   },
 
-  changeTypeAction: function (state, action, oldState) {
+  changeTypeAction(state, action, oldState) {
     const keys = action.key;
-    const value = action.value;
+    const { value } = action;
 
-    let parentKeys = utils.getParentKeys(keys);
-    let oldData = oldState.data;
-    let parentData = utils.getData(oldData, parentKeys);
-    if (parentData.type === value) {
+    const parentKeys = utils.getParentKeys(keys);
+    const oldData = oldState.data;
+    const parentData = utils.getData(oldData, parentKeys);
+    if (
+      parentData.type === value ||
+      (typeof parentData.type === 'undefined' && typeof value === 'undefined')
+    ) {
       return;
     }
-    let newParentData = utils.defaultSchema[value];
-    let newKeys = [].concat('data', parentKeys);
+    const newParentData = utils.defaultSchema[value] || {};
+    const newKeys = [].concat('data', parentKeys);
     utils.setData(state, newKeys, newParentData);
   },
 
-  enableRequireAction: function (state, action, oldState) {
+  enableRequireAction(state, action, oldState) {
     const keys = action.prefix;
-    let parentKeys = utils.getParentKeys(keys);
-    let oldData = oldState.data;
-    let parentData = utils.getData(oldData, parentKeys);
-    let requiredData = [].concat(parentData.required || []);
-    let index = requiredData.indexOf(action.name);
+    const parentKeys = utils.getParentKeys(keys);
+    const oldData = oldState.data;
+    const parentData = utils.getData(oldData, parentKeys);
+    const requiredData = [].concat(parentData.required || []);
+    const index = requiredData.indexOf(action.name);
 
     if (!action.required && index >= 0) {
       requiredData.splice(index, 1);
@@ -101,24 +106,23 @@ export default {
     }
   },
 
-  requireAllAction: function (state, action, oldState) {
+  requireAllAction(state, action, oldState) {
     // let oldData = oldState.data;
-    let data = utils.cloneObject(action.value)
-    utils.handleSchemaRequired(data, action.required)
+    const data = utils.cloneObject(action.value);
+    utils.handleSchemaRequired(data, action.required);
 
     state.data = data;
-
   },
 
-  deleteItemAction: function (state, action, oldState) {
+  deleteItemAction(state, action, oldState) {
     const keys = action.key;
 
-    let name = keys[keys.length - 1];
-    let oldData = oldState.data;
-    let parentKeys = utils.getParentKeys(keys);
-    let parentData = utils.getData(oldData, parentKeys);
-    let newParentData = {};
-    for (let i in parentData) {
+    const name = keys[keys.length - 1];
+    const oldData = oldState.data;
+    const parentKeys = utils.getParentKeys(keys);
+    const parentData = utils.getData(oldData, parentKeys);
+    const newParentData = {};
+    for (const i in parentData) {
       if (i !== name) {
         newParentData[i] = parentData[i];
       }
@@ -127,45 +131,45 @@ export default {
     utils.setData(state.data, parentKeys, newParentData);
   },
 
-  addFieldAction: function (state, action, oldState) {
+  addFieldAction(state, action, oldState) {
     const keys = action.prefix;
-    let oldData = oldState.data;
-    let name = action.name;
-    let propertiesData = utils.getData(oldData, keys);
+    const oldData = oldState.data;
+    const name = action.name;
+    const propertiesData = utils.getData(oldData, keys);
     let newPropertiesData = {};
     if (!name) {
       newPropertiesData = Object.assign({}, propertiesData);
-      newPropertiesData['field_' + fieldNum++] = utils.defaultSchema.string;
+      newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
     } else {
-      for (let i in propertiesData) {
+      for (const i in propertiesData) {
         newPropertiesData[i] = propertiesData[i];
         if (i === name) {
-          newPropertiesData['field_' + fieldNum++] = utils.defaultSchema.string;
+          newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
         }
       }
     }
     utils.setData(state.data, keys, newPropertiesData);
   },
-  addChildFieldAction: function (state, action, oldState) {
+  addChildFieldAction(state, action, oldState) {
     const keys = action.key;
-    let oldData = oldState.data;
-    let propertiesData = utils.getData(oldData, keys);
+    const oldData = oldState.data;
+    const propertiesData = utils.getData(oldData, keys);
     let newPropertiesData = {};
     newPropertiesData = Object.assign({}, propertiesData);
-    newPropertiesData['field_' + fieldNum++] = utils.defaultSchema.string;
+    newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
     utils.setData(state.data, keys, newPropertiesData);
   },
 
-  setOpenValueAction: function (state, action, oldState) {
+  setOpenValueAction(state, action, oldState) {
     const keys = action.key.join(utils.JSONPATH_JOIN_CHAR);
 
     let status;
     if (_.isUndefined(action.value)) {
-      status = utils.getData(oldState.open, [keys]) ? false : true;
+      status = !utils.getData(oldState.open, [keys]);
     } else {
       status = action.value;
     }
     utils.setData(state.open, [keys], status);
-  }
+  },
 
 };
