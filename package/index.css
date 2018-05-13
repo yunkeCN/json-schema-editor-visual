@@ -37,7 +37,7 @@
 .json-schema-react-editor .pretty-editor{
   border: 1px solid #d9d9d9;
   border-radius: 4px;
-  height: 800px;
+  height: 500px;
 }
 
 .json-schema-react-editor .import-json-button{

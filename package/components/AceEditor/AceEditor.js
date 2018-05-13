@@ -1,59 +1,56 @@
-import React from 'react'
-import mockEditor from './mockEditor'
-import PropTypes from 'prop-types'
-import aaa from './AceEditor.css'
+import React from 'react';
+import mockEditor from './mockEditor';
+import PropTypes from 'prop-types';
+import './AceEditor.css';
 
 const ModeMap = {
-  'javascript' : 'ace/mode/javascript',
-  'json' : 'ace/mode/json',
-  'text' : 'ace/mode/text',
-  'xml'  : 'ace/mode/xml',
-  'html' : 'ace/mode/html'
-}
+  javascript: 'ace/mode/javascript',
+  json: 'ace/mode/json',
+  text: 'ace/mode/text',
+  xml: 'ace/mode/xml',
+  html: 'ace/mode/html',
+};
 
-
-
-function getMode(mode){
-  return ModeMap[mode] || ModeMap.text
+function getMode(mode) {
+  return ModeMap[mode] || ModeMap.text;
 }
 
 class AceEditor extends React.PureComponent {
-  constructor(props){
-    super(props);
-  }
-
-  componentDidMount(){
+  componentDidMount() {
     this.editor = mockEditor({
       container: this.editorElement,
       data: this.props.data,
       onChange: this.props.onChange,
       readOnly: this.props.readOnly,
-      fullScreen: this.props.fullScreen
-    })
+      fullScreen: this.props.fullScreen,
+    });
 
-    let mode = this.props.mode || 'javascript';
+    const mode = this.props.mode || 'javascript';
     this.editor.editor.getSession().setMode(getMode(mode));
-    if(typeof this.props.callback === 'function'){
-      this.props.callback(this.editor.editor)
+    if (typeof this.props.callback === 'function') {
+      this.props.callback(this.editor.editor);
     }
   }
 
-  componentWillReceiveProps(nextProps){
-    
-    if(!this.editor) return;
-    if(nextProps.data !== this.props.data && this.editor.getValue() !== nextProps.data){
+  componentWillReceiveProps(nextProps) {
+    if (!this.editor) return;
+    if (nextProps.data !== this.props.data && this.editor.getValue() !== nextProps.data) {
       this.editor.setValue(nextProps.data);
-      
-      let mode = nextProps.mode || 'javascript';      
+
+      const mode = nextProps.mode || 'javascript';
       this.editor.editor.getSession().setMode(getMode(mode));
       this.editor.editor.clearSelection();
-    }    
+    }
   }
 
   render() {
-    return <div className={this.props.className} style={this.props.className ? undefined : this.props.style || {width: '100%', height: '200px'}} ref={editor=>{
-      this.editorElement=editor  
-    }} ></div>
+    return (
+      <div
+        className={this.props.className}
+        style={this.props.className ? undefined : this.props.style || { width: '100%', height: '200px' }}
+        ref={editor => this.editorElement = editor}
+      />
+    );
   }
 }
 
@@ -62,12 +59,12 @@ AceEditor.propTypes = {
   data: PropTypes.string,
   onChange: PropTypes.func,
   className: PropTypes.string,
-  mode: PropTypes.string, //enum[json, text, javascript], default is javascript
+  mode: PropTypes.string, // enum[json, text, javascript], default is javascript
   readOnly: PropTypes.bool,
   callback: PropTypes.func,
   style: PropTypes.object,
   fullScreen: PropTypes.bool,
-  insertCode: PropTypes.func
-}
+  insertCode: PropTypes.func,
+};
 
 export default AceEditor;

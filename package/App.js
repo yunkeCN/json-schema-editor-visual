@@ -333,7 +333,7 @@ class jsonSchema extends React.Component {
         >
           <CustomItem data={JSON.stringify(this.state.curItemCustomValue, null, 2)} />
         </Modal>
-        <Row>
+        <Row type="flex">
           {(layout === 'both' || layout === 'ide') && (
             <Col span={layout === 'both' ? 8 : 24}>
               <AceEditor
