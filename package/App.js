@@ -264,12 +264,12 @@ class jsonSchema extends React.Component {
 
     return (
       <div className="json-schema-react-editor">
-        <Radio.Group value={layout} onChange={this.handleLayoutChange}>
+        <Radio.Group size="small" value={layout} onChange={this.handleLayoutChange}>
           <Radio.Button value="ide">IDE</Radio.Button>
           <Radio.Button value="both">Both</Radio.Button>
           <Radio.Button value="form">Form</Radio.Button>
         </Radio.Group>
-        <Button className="import-json-button" type="primary" onClick={this.showModal}>
+        <Button size="small" className="import-json-button" type="primary" onClick={this.showModal}>
           {LocalProvider('import_json')}
         </Button>
         <Modal
