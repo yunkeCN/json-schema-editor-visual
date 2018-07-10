@@ -49,7 +49,7 @@ class SchemaString extends PureComponent {
   };
 
   changeEnumOtherValue = (value, data) => {
-    let arr = value.split('\n');
+    const arr = value.split('\n');
     if (arr.length === 0 || (arr.length == 1 && !arr[0])) {
 
     } else {

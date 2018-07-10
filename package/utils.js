@@ -66,7 +66,13 @@ exports.setData = function (state, keys, value) {
     curState = curState[keys[i]];
   }
 
-  curState[keys[keys.length - 1]] = value;
+  if (typeof value.type === 'undefined') {
+    curState[keys[keys.length - 1]] = value;
+  } else {
+    const { description } = curState[keys[keys.length - 1]] || {};
+
+    curState[keys[keys.length - 1]] = Object.assign({ description }, value);
+  }
 };
 
 exports.getParentKeys = function (keys) {
@@ -111,7 +117,7 @@ function handleSchemaRequired(schema, checked) {
 }
 
 function handleObject(properties, checked) {
-  for (let key in properties) {
+  for (const key in properties) {
     if (properties[key].type === 'array' || properties[key].type === 'object') { handleSchemaRequired(properties[key], checked); }
   }
 }
@@ -121,21 +127,19 @@ exports.handleSchemaRequired = handleSchemaRequired;
 function cloneObject(obj) {
   if (typeof obj === 'object') {
     if (Array.isArray(obj)) {
-      var newArr = [];
-      obj.forEach(function (item, index) {
-        newArr[index] = cloneObject(item)
-      })
+      const newArr = [];
+      obj.forEach((item, index) => {
+        newArr[index] = cloneObject(item);
+      });
       return newArr;
     }
-    var newObj = {};
-    for (var key in obj) {
+    const newObj = {};
+    for (const key in obj) {
       newObj[key] = cloneObject(obj[key]);
     }
     return newObj;
-
-  } else {
-    return obj;
   }
+  return obj;
 }
 
 exports.cloneObject = cloneObject;

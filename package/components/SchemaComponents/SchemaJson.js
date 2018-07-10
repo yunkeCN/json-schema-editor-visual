@@ -108,7 +108,7 @@ class SchemaArray extends PureComponent {
 
   render() {
     const {
-      data, prefix, showEdit, showAdv, refSchemas, refFunc
+      data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
     const { items } = data;
     const prefixArray = [].concat(prefix, 'items');
@@ -131,7 +131,7 @@ class SchemaArray extends PureComponent {
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
                       ) : (
-                          <Icon className="icon-object" type="caret-right" />
+                        <Icon className="icon-object" type="caret-right" />
                         )}
                     </span>
                   ) : null}
@@ -315,7 +315,7 @@ class SchemaItem extends PureComponent {
 
   render() {
     const {
-      name, data, prefix, showEdit, showAdv, refSchemas, refFunc
+      name, data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
     const value = data.properties[name];
     const prefixArray = [].concat(prefix, name);
@@ -338,7 +338,7 @@ class SchemaItem extends PureComponent {
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
                     ) : (
-                        <Icon className="icon-object" type="caret-right" />
+                      <Icon className="icon-object" type="caret-right" />
                       )}
                   </span>
                 ) : null}
@@ -398,7 +398,7 @@ class SchemaItem extends PureComponent {
           }
           {
             typeof value.$ref !== 'undefined' &&
-            <Col span={5} className="col-item col-item-type"/>
+            <Col span={5} className="col-item col-item-type" />
           }
           <Col span={3} className="col-item col-item-setting">
             <Icon type="close" className="close delete-item" onClick={this.handleDeleteItem} />
@@ -445,7 +445,7 @@ class SchemaObjectComponent extends Component {
 
   render() {
     const {
-      data, prefix, showEdit, showAdv, refSchemas, refFunc
+      data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
     return (
       <div className="object-style1">
