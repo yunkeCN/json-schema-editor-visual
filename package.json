@@ -1,6 +1,6 @@
 {
   "name": "@yued/json-schema-editor-visual",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "jsonschema editor",
   "main": "package/index.js",
   "license": "MIC",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "antd": "^3.1.6",
-    "brace": "^0.10.0",
+    "brace": "^0.11.1",
     "generate-schema": "^2.6.0",
     "moox": "^1.0.2",
     "react-redux": "^5.0.6",
