@@ -11,6 +11,7 @@ exports.format = [
   { name: 'uri' },
 ];
 const _ = require('underscore');
+const ISPROPERTIES = 'properties';
 
 exports.SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
 exports.defaultSchema = {
@@ -62,11 +63,14 @@ exports.getData = getData;
 
 exports.setData = function (state, keys, value) {
   let curState = state;
+  let isProperties = keys[keys.length - 1] === ISPROPERTIES;
   for (let i = 0; i < keys.length - 1; i++) {
     curState = curState[keys[i]];
   }
 
-  if (typeof value.type === 'undefined') {
+  if (isProperties) {
+    curState[keys[keys.length - 1]] = value;
+  } else if (typeof value.type === 'undefined') {
     curState[keys[keys.length - 1]] = value;
   } else {
     const { description } = curState[keys[keys.length - 1]] || {};
