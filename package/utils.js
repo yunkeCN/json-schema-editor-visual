@@ -11,9 +11,9 @@ exports.format = [
   { name: 'uri' },
 ];
 const _ = require('underscore');
-const ISPROPERTIES = 'properties';
+const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
 
-exports.SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
+exports.SCHEMA_TYPE = SCHEMA_TYPE;
 exports.defaultSchema = {
   string: {
     type: 'string',
@@ -63,14 +63,11 @@ exports.getData = getData;
 
 exports.setData = function (state, keys, value) {
   let curState = state;
-  let isProperties = keys[keys.length - 1] === ISPROPERTIES;
   for (let i = 0; i < keys.length - 1; i++) {
     curState = curState[keys[i]];
   }
 
-  if (isProperties) {
-    curState[keys[keys.length - 1]] = value;
-  } else if (typeof value.type === 'undefined') {
+  if (SCHEMA_TYPE.indexOf(value.type) === -1) {
     curState[keys[keys.length - 1]] = value;
   } else {
     const { description } = curState[keys[keys.length - 1]] || {};
