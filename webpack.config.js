@@ -1,10 +1,20 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+
+const isDev = process.env.NODE_ENV !== 'production';
+
+const dist = path.join(__dirname, 'dist');
 
 module.exports = {
-  entry: './package/index.js',
-  mode: 'production',
+  entry: {
+    main: isDev ? './src/index.js' : './package/index.js',
+  },
+  mode: process.env.NODE_ENV,
+  devtool: isDev ? '#cheap-module-eval-source-map' : false,
   output: {
-    publicPath: '/dist/',
+    // path: dist,
+    publicPath: '/',
     libraryTarget: 'umd',
     library: ['schema'],
     filename: '[name].js',
@@ -38,8 +48,14 @@ module.exports = {
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
     ],
   },
-  plugins: [new ExtractTextPlugin('main.css')],
-  externals: [
+  plugins: [
+    new ExtractTextPlugin('main.css'),
+    new HtmlWebpackPlugin({
+      template: 'index.html',
+      chunks: ['main'],
+    }),
+  ],
+  externals: isDev ? [] : [
     {
       react: {
         commonjs: 'react', commonjs2: 'react', amd: 'react', root: ['React'],
