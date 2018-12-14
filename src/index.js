@@ -695,8 +695,61 @@ let schema = {
   required: ['status']
 };
 
+let schema2 = {
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type1": {
+            "type": "string",
+            "default": "好的",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "1"
+          },
+          "title": {
+            "description": "s",
+            "type": "number"
+          },
+          "value": {
+            "description": "判断是否有数据，0-否，1-是",
+            "type": "number"
+          },
+          "has_data": {
+            "type": "number",
+            "description": "判断是否有数据，0-否，1-是"
+          }
+        },
+        "required": [
+          "name",
+          "type1",
+          "value",
+          "has_data",
+          "title"
+        ]
+      },
+      "description": "s"
+    },
+    "retCode1": {
+      "type": "string"
+    },
+    "retMsg1": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "retMsg1"
+  ]
+}
 
-schema = JSON.stringify(schema, null, '  ');
+schema = JSON.stringify(schema2, null, '  ');
 
 const refSchemas = [
   {
@@ -757,7 +810,7 @@ render(
       showEditor={true}
       data={schema}
       onChange={e => {
-        console.log('changeValue', e);
+        // console.log('changeValue', e);
       }}
       refSchemas={refSchemas}
     />

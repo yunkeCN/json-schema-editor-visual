@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import './index.css';
 import AceEditor from './components/AceEditor/AceEditor';
 import SchemaJson from './components/SchemaComponents/SchemaJson';
-import { SCHEMA_TYPE, debounce } from './utils';
+import { SCHEMA_TYPE, Combination_Criteria, isCombinationCriteria, debounce } from './utils';
 import handleSchema from './schema';
 import CustomItem from './components/SchemaComponents/SchemaOther';
 import LocalProvider from './components/LocalProvider/index';
@@ -140,7 +140,12 @@ class jsonSchema extends React.Component {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    } else {
+    } 
+    else if (Combination_Criteria.indexOf(value) !== -1) {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
+    }
+    else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -158,6 +163,16 @@ class jsonSchema extends React.Component {
     }
     this.jsonSchemaData = e.jsonData;
   };
+
+  addChildNode = () => {
+    let CC = null;
+    if (this.props.schema.type === 'object') {
+      this.addChildField('properties');
+    } else if (CC = isCombinationCriteria(this.props.schema)) {
+      this.addChildField(CC);
+      this.Model.setOpenValueAction({ key: [CC], value: true });
+    }
+  }
   // 增加子节点
   addChildField = (key) => {
     this.Model.addChildFieldAction({ key: [key] });
@@ -249,6 +264,31 @@ class jsonSchema extends React.Component {
     this.setState({ layout: e.target.value });
   };
 
+  handleSelectTypeValue = (schema) => {
+    let value = '';
+    if (schema.type !== undefined) {
+      return schema.type;
+    }
+    if (schema.$ref !== undefined) {
+      return `ref:${schema.$ref}`;
+    }
+    if (value = isCombinationCriteria(schema)) {
+      return value;
+    }
+    return value;
+  }
+
+  showDownStyleOrAddChildNode = (schema) => {
+    let show = false;
+    if (schema.type === 'object') {
+      return true;
+    }
+    if (show = isCombinationCriteria(schema)) {
+      return !!show;
+    }
+    return show;
+  }
+
   render() {
     const {
       visible,
@@ -260,6 +300,7 @@ class jsonSchema extends React.Component {
     } = this.state;
 
     const { type } = this.props.schema;
+    const selectTypeValue = this.handleSelectTypeValue(this.props.schema);
     const disabled = !(type === 'object' || type === 'array');
 
     return (
@@ -351,7 +392,7 @@ class jsonSchema extends React.Component {
                 <Col span={12} className="col-item name-item col-item-name">
                   <Row type="flex" justify="space-around" align="middle">
                     <Col span={2} className="down-style-col">
-                      {this.props.schema.type === 'object' ? (
+                      {this.showDownStyleOrAddChildNode(this.props.schema) ? (
                         <span className="down-style" onClick={this.clickIcon}>
                           {this.state.show ?
                             <Icon
@@ -390,7 +431,7 @@ class jsonSchema extends React.Component {
                     showSearch
                     className="type-select-style"
                     onChange={this.handleChangeTypeOrRef}
-                    value={this.props.schema.type || `ref:${this.props.schema.$ref}`}
+                    value={selectTypeValue}
                     filterOption={(input, option) => (
                       option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                     )}
@@ -402,13 +443,20 @@ class jsonSchema extends React.Component {
                         </Option>
                       ))}
                     </OptGroup>
-                    <OptGroup label="Ref">
+                    <OptGroup label="Combine">
+                      {Combination_Criteria.map(item => (
+                        <Option value={item} key={item}>
+                          {item}
+                        </Option>
+                      ))}
+                    </OptGroup>
+                    {/*<OptGroup label="Ref">
                       {this.props.refSchemas.map(item => (
                         <Option value={`ref:${this.props.refFunc(item)}`} key={item}>
                           {item.name}
                         </Option>
                       ))}
-                    </OptGroup>
+                      </OptGroup>*/}
                   </Select>
                 </Col>
                 {
@@ -440,9 +488,9 @@ class jsonSchema extends React.Component {
                     <Icon className="adv-set" type="setting" />
                   </Tooltip>
                   {
-                    this.props.schema.type === 'object' &&
+                    this.showDownStyleOrAddChildNode(this.props.schema) &&
                     <Tooltip
-                      onClick={() => this.addChildField('properties')}
+                      onClick={this.addChildNode}
                       placement="top"
                       title={LocalProvider('add_child_node')}
                     >

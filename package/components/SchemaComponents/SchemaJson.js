@@ -17,7 +17,7 @@ import _ from 'underscore';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../../utils';
+import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE, Combination_Criteria, isCombinationCriteria } from '../../utils';
 import LocaleProvider from '../LocalProvider/index';
 
 const { Option, OptGroup } = Select;
@@ -26,15 +26,46 @@ const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   switch (data.type) {
     case 'array':
       return <SchemaArray prefix={name} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-      break;
     case 'object':
       const nameArray = [].concat(name, 'properties');
       return <SchemaObject prefix={nameArray} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-      break;
     default:
-      return null;
+      let refComponent = null;
+      for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
+        if (Array.isArray(data[Combination_Criteria[i]])) {
+          const nameArray = [].concat(name, Combination_Criteria[i]);
+          refComponent = <SchemaMixed prefix={nameArray} data={data[Combination_Criteria[i]]} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
+          break;
+        }
+      }
+      return refComponent;
   }
 };
+
+const handleSelectTypeValue = (schema) => {
+  let value = '';
+  if (schema.type !== undefined) {
+    return schema.type;
+  }
+  if (schema.$ref !== undefined) {
+    return `ref:${schema.$ref}`;
+  }
+  if (value = isCombinationCriteria(schema)) {
+    return value;
+  }
+  return value;
+}
+
+const showDownStyleOrAddChildNode = (schema) => {
+  let show = false;
+  if (schema.type === 'object') {
+    return true;
+  }
+  if (show = isCombinationCriteria(schema)) {
+    return !!show;
+  }
+  return show;
+}
 
 class SchemaArray extends PureComponent {
   constructor(props, context) {
@@ -69,7 +100,12 @@ class SchemaArray extends PureComponent {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    } else {
+    }
+    else if (Combination_Criteria.indexOf(value) !== -1) {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
+    } 
+    else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -111,6 +147,8 @@ class SchemaArray extends PureComponent {
       data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
     const { items } = data;
+    const itemTypeValue = handleSelectTypeValue(items);
+    const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(items);
     const prefixArray = [].concat(prefix, 'items');
 
     const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
@@ -126,7 +164,7 @@ class SchemaArray extends PureComponent {
             >
               <Row type="flex" justify="space-around" align="middle">
                 <Col span={2} className="down-style-col">
-                  {items.type === 'object' ? (
+                  {isShowDownStyleOrAdd ? (
                     <span className="down-style" onClick={this.handleClickIcon}>
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
@@ -146,13 +184,20 @@ class SchemaArray extends PureComponent {
                 showSearch
                 className="type-select-style"
                 onChange={this.handleChangeTypeOrRef}
-                value={items.type || `ref:${items.$ref}`}
+                value={itemTypeValue}
                 filterOption={(input, option) => (
                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 )}
               >
                 <OptGroup label="Basic">
                   {SCHEMA_TYPE.map(item => (
+                    <Option value={item} key={item}>
+                      {item}
+                    </Option>
+                  ))}
+                </OptGroup>
+                <OptGroup label="Combine">
+                  {Combination_Criteria.map(item => (
                     <Option value={item} key={item}>
                       {item}
                     </Option>
@@ -190,7 +235,7 @@ class SchemaArray extends PureComponent {
                 <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
               </Tooltip>
               {
-                items.type === 'object' &&
+                isShowDownStyleOrAdd &&
                 <Tooltip
                   placement="top"
                   title={LocaleProvider('add_child_node')}
@@ -266,7 +311,12 @@ class SchemaItem extends PureComponent {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    } else {
+    }
+    else if (Combination_Criteria.indexOf(value) !== -1) {
+      this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
+    } 
+    else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -288,7 +338,7 @@ class SchemaItem extends PureComponent {
   // 展示高级设置弹窗
   handleShowAdv = () => {
     const { data, name, showAdv } = this.props;
-    showAdv(this.getPrefix(), data.properties[name]);
+    showAdv(this.getPrefix(), data.properties && data.properties[name] || data);
   };
 
   //  增加子节点
@@ -317,12 +367,17 @@ class SchemaItem extends PureComponent {
     const {
       name, data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
-    const value = data.properties[name];
+    
     const prefixArray = [].concat(prefix, name);
     const prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
     const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     const show = this.context.getOpenValue([prefixStr]);
     const showIcon = this.context.getOpenValue([prefixArrayStr]);
+    const disabled = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    const value = disabled ? data : data.properties[name];
+    const typeValue = handleSelectTypeValue(value);
+    const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(value);
+
     return show ? (
       <div>
         <Row className="row" type="flex" justify="space-around" align="middle">
@@ -333,7 +388,7 @@ class SchemaItem extends PureComponent {
           >
             <Row type="flex" justify="space-around" align="middle">
               <Col span={2} className="down-style-col">
-                {value.type === 'object' ? (
+                {isShowDownStyleOrAdd ? (
                   <span className="down-style" onClick={this.handleClickIcon}>
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
@@ -348,6 +403,7 @@ class SchemaItem extends PureComponent {
                   addonAfter={
                     <Checkbox
                       onChange={this.handleEnableRequire}
+                      disabled={disabled}
                       checked={
                         _.isUndefined(data.required) ? false : data.required.indexOf(name) != -1
                       }
@@ -355,6 +411,7 @@ class SchemaItem extends PureComponent {
                   }
                   onChange={this.handleChangeName}
                   value={name}
+                  disabled={disabled}
                 />
               </Col>
             </Row>
@@ -364,13 +421,20 @@ class SchemaItem extends PureComponent {
               showSearch
               className="type-select-style"
               onChange={this.handleChangeTypeOrRef}
-              value={value.type || `ref:${value.$ref}`}
+              value={typeValue}
               filterOption={(input, option) => (
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               )}
             >
               <OptGroup label="Basic">
                 {SCHEMA_TYPE.map(item => (
+                  <Option value={item} key={item}>
+                    {item}
+                  </Option>
+                ))}
+              </OptGroup>
+              <OptGroup label="Combine">
+                {Combination_Criteria.map(item => (
                   <Option value={item} key={item}>
                     {item}
                   </Option>
@@ -408,8 +472,8 @@ class SchemaItem extends PureComponent {
             >
               <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
             </Tooltip>
-            {value.type === 'object' ?
-              <DropPlus prefix={prefix} name={name} />
+            {isShowDownStyleOrAdd ?
+              <DropPlus prefix={prefix} name={name} schema={value} />
               :
               <Tooltip
                 placement="top"
@@ -470,9 +534,49 @@ const SchemaObject = connect(state => ({
   open: state.schema.open,
 }))(SchemaObjectComponent);
 
+class SchemaMixedComponent extends Component {
+  shouldComponentUpdate(nextProps) {
+    if (
+      _.isEqual(nextProps.data, this.props.data) &&
+      _.isEqual(nextProps.prefix, this.props.prefix) &&
+      _.isEqual(nextProps.open, this.props.open)
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  render() {
+    const {
+      data, prefix, showEdit, showAdv, refSchemas, refFunc,
+    } = this.props;
+    return (
+      <div className="ref-style1">
+        {data.map((currentItem, index) => (
+          <SchemaItem
+            key={index}
+            data={currentItem}
+            refSchemas={refSchemas}
+            refFunc={refFunc}
+            name={index}
+            prefix={prefix}
+            showEdit={showEdit}
+            showAdv={showAdv}
+          />
+        ))}
+      </div>
+    );
+  }
+}
+
+const SchemaMixed = connect(state => ({
+  open: state.schema.open,
+}))(SchemaMixedComponent);
+
 const DropPlus = (props, context) => {
-  const { prefix, name, add } = props;
+  const { prefix, name, add, schema } = props;
   const Model = context.Model.schema;
+
   const menu = (
     <Menu>
       <Menu.Item>
@@ -482,8 +586,14 @@ const DropPlus = (props, context) => {
       </Menu.Item>
       <Menu.Item>
         <span onClick={() => {
-          Model.setOpenValueAction({ key: [].concat(prefix, name, 'properties'), value: true });
-          Model.addChildFieldAction({ key: [].concat(prefix, name, 'properties') });
+          let CC = null;
+          if (schema.type === 'object') {
+            Model.setOpenValueAction({ key: [].concat(prefix, name, 'properties'), value: true });
+            Model.addChildFieldAction({ key: [].concat(prefix, name, 'properties') });
+          } else if (CC = isCombinationCriteria(schema)) {
+            Model.setOpenValueAction({ key: [].concat(prefix, name, CC), value: true });
+            Model.addChildFieldAction({ key: [].concat(prefix, name, CC) });
+          }
         }
         }
         >

@@ -12,8 +12,10 @@ exports.format = [
 ];
 const _ = require('underscore');
 const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
+const Combination_Criteria = ['allOf', 'anyOf', 'oneOf', 'not'];
 
 exports.SCHEMA_TYPE = SCHEMA_TYPE;
+exports.Combination_Criteria = Combination_Criteria;
 exports.defaultSchema = {
   string: {
     type: 'string',
@@ -36,6 +38,18 @@ exports.defaultSchema = {
   },
   integer: {
     type: 'integer',
+  },
+  allOf: {
+    allOf: [],
+  },
+  anyOf: {
+    anyOf: [],
+  },
+  oneOf: {
+    oneOf: [],
+  },
+  not: {
+    not: [],
   },
 };
 
@@ -144,3 +158,16 @@ function cloneObject(obj) {
 }
 
 exports.cloneObject = cloneObject;
+
+function isCombinationCriteria(schema) {
+  let isCC = false;
+  for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
+    if (Array.isArray(schema[Combination_Criteria[i]])) {
+      isCC = Combination_Criteria[i];
+      break;
+    }
+  }
+  return isCC;
+}
+
+exports.isCombinationCriteria = isCombinationCriteria;

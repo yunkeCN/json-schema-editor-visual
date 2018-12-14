@@ -64,9 +64,28 @@ export default {
     utils.setData(state.data, keys, newPropertiesData);
   },
 
-  changeValueAction(state, action) {
+  changeValueAction(state, action, oldState) {
     const keys = action.key;
-    utils.setData(state.data, keys, action.value);
+    const key = keys[keys.length -1];
+
+    if (utils.Combination_Criteria.indexOf(key) !== -1) {
+      const parentKeys = utils.getParentKeys(keys);
+      const oldData = oldState.data;
+      const parentData = utils.getData(oldData, parentKeys);
+      
+      const newParentData = {};
+      newParentData[key] = action.value;
+      for (let field in parentData) {
+        if (utils.Combination_Criteria.indexOf(field) === -1) {
+          newParentData[field] = parentData[field];
+        }
+      }
+      
+      const newKeys = [].concat('data', parentKeys);
+      utils.setData(state, newKeys, newParentData);
+    } else {
+      utils.setData(state.data, keys, action.value);
+    }
   },
 
   changeTypeAction(state, action, oldState) {
@@ -121,14 +140,20 @@ export default {
     const oldData = oldState.data;
     const parentKeys = utils.getParentKeys(keys);
     const parentData = utils.getData(oldData, parentKeys);
-    const newParentData = {};
-    for (const i in parentData) {
-      if (i !== name) {
-        newParentData[i] = parentData[i];
+    
+    if (Array.isArray(parentData)) {
+      const newParentData = parentData.slice();
+      newParentData.splice(name, 1);
+      utils.setData(state.data, parentKeys, newParentData);
+    } else {
+      const newParentData = {};
+      for (const i in parentData) {
+        if (i !== name) {
+          newParentData[i] = parentData[i];
+        }
       }
+      utils.setData(state.data, parentKeys, newParentData);
     }
-
-    utils.setData(state.data, parentKeys, newParentData);
   },
 
   addFieldAction(state, action, oldState) {
@@ -136,28 +161,49 @@ export default {
     const oldData = oldState.data;
     const name = action.name;
     const propertiesData = utils.getData(oldData, keys);
-    let newPropertiesData = {};
-    if (!name) {
-      newPropertiesData = Object.assign({}, propertiesData);
-      newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
+    const isArray = Array.isArray(propertiesData);
+    if (isArray) {
+      let newPropertiesData = [];
+      if (name === undefined) {
+        newPropertiesData = [].concat(propertiesData);
+        newPropertiesData.push(utils.defaultSchema.string);
+      } else {
+        newPropertiesData = [].concat(propertiesData);
+        newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
+      }
+      utils.setData(state.data, keys, newPropertiesData);
     } else {
-      for (const i in propertiesData) {
-        newPropertiesData[i] = propertiesData[i];
-        if (i === name) {
-          newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
+      let newPropertiesData = {};
+      if (!name) {
+        newPropertiesData = Object.assign({}, propertiesData);
+        newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
+      } else {
+        for (const i in propertiesData) {
+          newPropertiesData[i] = propertiesData[i];
+          if (i === name) {
+            newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
+          }
         }
       }
+      utils.setData(state.data, keys, newPropertiesData);
     }
-    utils.setData(state.data, keys, newPropertiesData);
   },
   addChildFieldAction(state, action, oldState) {
     const keys = action.key;
     const oldData = oldState.data;
     const propertiesData = utils.getData(oldData, keys);
-    let newPropertiesData = {};
-    newPropertiesData = Object.assign({}, propertiesData);
-    newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
-    utils.setData(state.data, keys, newPropertiesData);
+    const isArray = Array.isArray(propertiesData);
+    if (isArray) {
+      let newPropertiesData = [];
+      newPropertiesData = [].concat(propertiesData);
+      newPropertiesData.push(utils.defaultSchema.string);
+      utils.setData(state.data, keys, newPropertiesData);
+    } else {
+      let newPropertiesData = {};
+      newPropertiesData = Object.assign({}, propertiesData);
+      newPropertiesData[`field_${fieldNum++}`] = utils.defaultSchema.string;
+      utils.setData(state.data, keys, newPropertiesData);
+    }
   },
 
   setOpenValueAction(state, action, oldState) {
