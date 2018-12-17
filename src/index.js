@@ -758,10 +758,10 @@ const refSchemas = [
     schema: {
       type: 'object',
       properties: {
-        id: {
+        uid: {
           type: 'string'
         },
-        name: {
+        uname: {
           type: 'string'
         },
       },
@@ -773,10 +773,10 @@ const refSchemas = [
     schema: {
       type: 'object',
       properties: {
-        id: {
+        pid: {
           type: 'string'
         },
-        name: {
+        pname: {
           type: 'string'
         },
       },

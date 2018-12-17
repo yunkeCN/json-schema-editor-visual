@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 
 import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE, Combination_Criteria, isCombinationCriteria } from '../../utils';
 import LocaleProvider from '../LocalProvider/index';
+import refMapping from './SchemaRef'
 
 const { Option, OptGroup } = Select;
 
@@ -30,15 +31,15 @@ const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
       const nameArray = [].concat(name, 'properties');
       return <SchemaObject prefix={nameArray} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
     default:
-      let refComponent = null;
+      let component = null;
       for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
         if (Array.isArray(data[Combination_Criteria[i]])) {
           const nameArray = [].concat(name, Combination_Criteria[i]);
-          refComponent = <SchemaMixed prefix={nameArray} data={data[Combination_Criteria[i]]} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
+          component = <SchemaMixed prefix={nameArray} data={data[Combination_Criteria[i]]} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
           break;
         }
       }
-      return refComponent;
+      return component;
   }
 };
 
@@ -59,6 +60,9 @@ const handleSelectTypeValue = (schema) => {
 const showDownStyleOrAddChildNode = (schema) => {
   let show = false;
   if (schema.type === 'object') {
+    return true;
+  }
+  if (schema.$ref !== undefined) {
     return true;
   }
   if (show = isCombinationCriteria(schema)) {
@@ -153,6 +157,25 @@ class SchemaArray extends PureComponent {
 
     const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     const showIcon = this.context.getOpenValue([prefixArrayStr]);
+
+    let subordinate = null;
+    if (typeof items.$ref === 'string') {
+      let ref = items.$ref.split('/');
+      ref = ref[ref.length -1];
+      if (ref !== undefined) {
+        let refData = null;
+        for (let i = 0, len = refSchemas.length; i < len; i++) {
+          if (ref === refSchemas[i].id) {
+            refData = refSchemas[i].schema;
+            break;
+          }
+        }
+        subordinate = refMapping(prefixArray, refData, showEdit, showAdv, refSchemas, refFunc);
+      }
+    } else {
+      subordinate = mapping(prefixArray, items, showEdit, showAdv, refSchemas, refFunc);
+    }
+
     return (
       !_.isUndefined(data.items) && (
         <div className="array-type">
@@ -245,7 +268,7 @@ class SchemaArray extends PureComponent {
               }
             </Col>
           </Row>
-          <div className="option-formStyle">{mapping(prefixArray, items, showEdit, showAdv, refSchemas, refFunc)}</div>
+          <div className="option-formStyle">{subordinate}</div>
         </div>
       )
     );
@@ -314,6 +337,7 @@ class SchemaItem extends PureComponent {
     }
     else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
     } 
     else {
@@ -349,10 +373,18 @@ class SchemaItem extends PureComponent {
 
   // 控制三角形按钮
   handleClickIcon = () => {
-    const prefix = this.getPrefix();
-    // 数据存储在 properties.xxx.properties 下
-    const keyArr = [].concat(prefix, 'properties');
-    this.Model.setOpenValueAction({ key: keyArr });
+    const { prefix, data, name } = this.props;
+    const prefixArray = [].concat(prefix, name);
+    let isCC = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    const value = isCC ? data : data.properties[name];
+
+    if (isCC = isCombinationCriteria(value)) {
+      const keyArr = [].concat(prefixArray, isCC);
+      this.Model.setOpenValueAction({ key: keyArr });
+    } else {
+      const keyArr = [].concat(prefixArray, 'properties');
+      this.Model.setOpenValueAction({ key: keyArr });
+    }
   };
 
   // 修改是否必须
@@ -370,13 +402,47 @@ class SchemaItem extends PureComponent {
     
     const prefixArray = [].concat(prefix, name);
     const prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
-    const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
+    let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     const show = this.context.getOpenValue([prefixStr]);
-    const showIcon = this.context.getOpenValue([prefixArrayStr]);
+    let showIcon = this.context.getOpenValue([prefixArrayStr]);
     const disabled = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
     const value = disabled ? data : data.properties[name];
+
+    let isCC = null;
+    if (isCC = isCombinationCriteria(value)) {
+      prefixArrayStr = [].concat(prefixArray, isCC).join(JSONPATH_JOIN_CHAR);
+      showIcon = this.context.getOpenValue([prefixArrayStr]);
+    }
+
     const typeValue = handleSelectTypeValue(value);
     const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(value);
+
+    let schemaType = null;
+    if (prefix[prefix.length -1] === 'allOf') {
+      schemaType = SCHEMA_TYPE.filter((item) => {
+        return item === 'object';
+      })
+    } else {
+      schemaType = SCHEMA_TYPE;
+    }
+
+    let subordinate = null;
+    if (typeof value.$ref === 'string') {
+      let ref = value.$ref.split('/');
+      ref = ref[ref.length -1];
+      if (ref !== undefined) {
+        let refData = null;
+        for (let i = 0, len = refSchemas.length; i < len; i++) {
+          if (ref === refSchemas[i].id) {
+            refData = refSchemas[i].schema;
+            break;
+          }
+        }
+        subordinate = refMapping(prefixArray, refData, showEdit, showAdv, refSchemas, refFunc);
+      }
+    } else {
+      subordinate = mapping(prefixArray, value, showEdit, showAdv, refSchemas, refFunc);
+    }
 
     return show ? (
       <div>
@@ -427,7 +493,7 @@ class SchemaItem extends PureComponent {
               )}
             >
               <OptGroup label="Basic">
-                {SCHEMA_TYPE.map(item => (
+                {schemaType.map(item => (
                   <Option value={item} key={item}>
                     {item}
                   </Option>
@@ -484,7 +550,7 @@ class SchemaItem extends PureComponent {
             }
           </Col>
         </Row>
-        <div className="option-formStyle">{mapping(prefixArray, value, showEdit, showAdv, refSchemas, refFunc)}</div>
+        <div className="option-formStyle">{subordinate}</div>
       </div>
     ) : null;
   }

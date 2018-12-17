@@ -68,7 +68,7 @@ export default {
     const keys = action.key;
     const key = keys[keys.length -1];
 
-    if (utils.Combination_Criteria.indexOf(key) !== -1) {
+    if (key === '$ref' || utils.Combination_Criteria.indexOf(key) !== -1) {
       const parentKeys = utils.getParentKeys(keys);
       const oldData = oldState.data;
       const parentData = utils.getData(oldData, parentKeys);
@@ -76,7 +76,7 @@ export default {
       const newParentData = {};
       newParentData[key] = action.value;
       for (let field in parentData) {
-        if (utils.Combination_Criteria.indexOf(field) === -1) {
+        if (utils.Combination_Criteria.indexOf(field) === -1 && field !== '$ref') {
           newParentData[field] = parentData[field];
         }
       }
@@ -196,7 +196,11 @@ export default {
     if (isArray) {
       let newPropertiesData = [];
       newPropertiesData = [].concat(propertiesData);
-      newPropertiesData.push(utils.defaultSchema.string);
+      if (keys[keys.length -1] ==='allOf') {
+        newPropertiesData.push(utils.defaultSchema.object);
+      } else {
+        newPropertiesData.push(utils.defaultSchema.string);
+      }
       utils.setData(state.data, keys, newPropertiesData);
     } else {
       let newPropertiesData = {};
