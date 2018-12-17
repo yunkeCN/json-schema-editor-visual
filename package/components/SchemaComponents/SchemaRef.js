@@ -109,8 +109,8 @@ class SchemaRefArray extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas.id) {
-            refData = refSchemas.schema;
+          if (ref === refSchemas[i]._id + '') {
+            refData = refSchemas[i].body;
             break;
           }
         }
@@ -245,8 +245,8 @@ class SchemaRefItem extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas[i].id) {
-            refData = refSchemas[i].schema;
+          if (ref === refSchemas[i]._id + '') {
+            refData = refSchemas[i].body;
             break;
           }
         }
