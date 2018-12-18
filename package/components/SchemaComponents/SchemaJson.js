@@ -107,6 +107,7 @@ class SchemaArray extends PureComponent {
     }
     else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
+      this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
     } 
     else {
@@ -226,13 +227,13 @@ class SchemaArray extends PureComponent {
                     </Option>
                   ))}
                 </OptGroup>
-                <OptGroup label="Ref">
+                {/*<OptGroup label="Ref">
                   {refSchemas.map(item => (
                     <Option value={`ref:${refFunc(item)}`} key={item}>
                       {item.name}
                     </Option>
                   ))}
-                </OptGroup>
+                </OptGroup>*/}
               </Select>
             </Col>
             {
