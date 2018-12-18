@@ -57,12 +57,23 @@ const handleSelectTypeValue = (schema) => {
   return value;
 }
 
-const showDownStyleOrAddChildNode = (schema) => {
+const showDownStyle = (schema) => {
   let show = false;
   if (schema.type === 'object') {
     return true;
   }
   if (schema.$ref !== undefined) {
+    return true;
+  }
+  if (show = isCombinationCriteria(schema)) {
+    return !!show;
+  }
+  return show;
+}
+
+const showAddChildNode = (schema) => {
+  let show = false;
+  if (schema.type === 'object') {
     return true;
   }
   if (show = isCombinationCriteria(schema)) {
@@ -125,10 +136,18 @@ class SchemaArray extends PureComponent {
 
   // 增加子节点
   handleAddChildField = () => {
-    const prefix = this.getPrefix();
-    const keyArr = [].concat(prefix, 'properties');
-    this.Model.addChildFieldAction({ key: keyArr });
-    this.Model.setOpenValueAction({ key: keyArr, value: true });
+    let prefix = this.getPrefix();
+    let CC = null;
+    let schema = this.props.data.items;
+    if (schema.type === 'object') {
+      let keyArr = [].concat(prefix, 'properties');
+      this.Model.addChildFieldAction({ key: keyArr });
+      this.Model.setOpenValueAction({ key: keyArr, value: true });
+    } else if (CC = isCombinationCriteria(schema)) {
+      let keyArr = [].concat(prefix, CC);
+      this.Model.addChildFieldAction({ key: keyArr });
+      this.Model.setOpenValueAction({ key: keyArr, value: true });
+    }
   };
 
   handleClickIcon = () => {
@@ -153,7 +172,8 @@ class SchemaArray extends PureComponent {
     } = this.props;
     const { items } = data;
     const itemTypeValue = handleSelectTypeValue(items);
-    const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(items);
+    const isShowDownStyle = showDownStyle(items);
+    const isShowAddChildNode = showAddChildNode(items);
     const prefixArray = [].concat(prefix, 'items');
 
     const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
@@ -188,7 +208,7 @@ class SchemaArray extends PureComponent {
             >
               <Row type="flex" justify="space-around" align="middle">
                 <Col span={2} className="down-style-col">
-                  {isShowDownStyleOrAdd ? (
+                  {isShowDownStyle ? (
                     <span className="down-style" onClick={this.handleClickIcon}>
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
@@ -227,13 +247,13 @@ class SchemaArray extends PureComponent {
                     </Option>
                   ))}
                 </OptGroup>
-                {/*<OptGroup label="Ref">
+                <OptGroup label="Ref">
                   {refSchemas.map(item => (
                     <Option value={`ref:${refFunc(item)}`} key={item}>
                       {item.name}
                     </Option>
                   ))}
-                </OptGroup>*/}
+                </OptGroup>
               </Select>
             </Col>
             {
@@ -259,7 +279,7 @@ class SchemaArray extends PureComponent {
                 <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
               </Tooltip>
               {
-                isShowDownStyleOrAdd &&
+                isShowAddChildNode &&
                 <Tooltip
                   placement="top"
                   title={LocaleProvider('add_child_node')}
@@ -416,7 +436,8 @@ class SchemaItem extends PureComponent {
     }
 
     const typeValue = handleSelectTypeValue(value);
-    const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(value);
+    const isShowDownStyle = showDownStyle(value);
+    const isShowAddChildNode = showAddChildNode(value);
 
     let schemaType = null;
     if (prefix[prefix.length -1] === 'allOf') {
@@ -455,7 +476,7 @@ class SchemaItem extends PureComponent {
           >
             <Row type="flex" justify="space-around" align="middle">
               <Col span={2} className="down-style-col">
-                {isShowDownStyleOrAdd ? (
+                {isShowDownStyle ? (
                   <span className="down-style" onClick={this.handleClickIcon}>
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
@@ -539,7 +560,7 @@ class SchemaItem extends PureComponent {
             >
               <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
             </Tooltip>
-            {isShowDownStyleOrAdd ?
+            {isShowAddChildNode ?
               <DropPlus prefix={prefix} name={name} schema={value} />
               :
               <Tooltip
