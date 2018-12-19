@@ -84,9 +84,13 @@ class SchemaRefArray extends PureComponent {
   }
 
   handleClickIcon = () => {
+    const { data } = this.props;
     const prefix = this.getPrefix();
-    // 数据存储在 properties.name.properties下
-    const keyArr = [].concat(prefix, 'properties');
+    let keyArr = [].concat(prefix, 'properties');
+    let isCC = null;
+    if (isCC = isCombinationCriteria(data.items)) {
+      keyArr = [].concat(prefix, isCC);
+    }
     this.Model.setOpenValueAction({ key: keyArr });
   };
 
@@ -99,7 +103,11 @@ class SchemaRefArray extends PureComponent {
     const isShowDownStyleOrAdd = showDownStyleOrAddChildNode(items);
     const prefixArray = [].concat(prefix, 'items');
 
-    const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
+    let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
+    let isCC = null;
+    if (isCC = isCombinationCriteria(items)) {
+      prefixArrayStr = [].concat(prefixArray, isCC).join(JSONPATH_JOIN_CHAR);
+    }
     const showIcon = this.context.getOpenValue([prefixArrayStr]);
 
     let subordinate = null;
@@ -114,7 +122,11 @@ class SchemaRefArray extends PureComponent {
             break;
           }
         }
-        subordinate = refMapping(prefixArray, refData, showEdit, showAdv, refSchemas, refFunc);
+        let refData2 = {};
+        refData2.type = 'object';
+        refData2.properties = {};
+        refData2.properties.root = refData;
+        subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
       }
     } else {
       subordinate = refMapping(prefixArray, items, showEdit, showAdv, refSchemas, refFunc);
@@ -250,7 +262,11 @@ class SchemaRefItem extends PureComponent {
             break;
           }
         }
-        subordinate = refMapping(prefixArray, refData, showEdit, showAdv, refSchemas, refFunc);
+        let refData2 = {};
+        refData2.type = 'object';
+        refData2.properties = {};
+        refData2.properties.root = refData;
+        subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
       }
     } else {
       subordinate = refMapping(prefixArray, value, showEdit, showAdv, refSchemas, refFunc);

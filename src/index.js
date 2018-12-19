@@ -771,15 +771,32 @@ const refSchemas = [
     _id: 'product',
     name: 'Product',
     body: {
-      type: 'object',
-      properties: {
-        pid: {
-          type: 'string'
+      type: "array",
+      items: {
+        type: "string"
+      }
+    }
+  },
+  {
+    _id: 'test-01',
+    name: 'Test-01',
+    body: {
+      type: 'string',
+      description: "2"
+    }
+  },
+  {
+    _id: 'test-02',
+    name: 'Test-02',
+    body: {
+      anyOf: [
+        {
+          type: "string"
         },
-        pname: {
-          type: 'string'
-        },
-      },
+        {
+          type: "number"
+        }
+      ]
     }
   }
 ];
