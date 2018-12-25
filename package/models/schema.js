@@ -16,6 +16,10 @@ export default {
     },
     open: {
       properties: true,
+      allOf: true,
+      anyOf: true,
+      oneOf: true,
+      not: true,
     },
   },
 
