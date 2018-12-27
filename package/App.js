@@ -372,7 +372,7 @@ class jsonSchema extends React.Component {
           cancelText={LocalProvider('cancel')}
           className="json-schema-react-editor-adv-modal"
         >
-          <CustomItem data={JSON.stringify(this.state.curItemCustomValue, null, 2)} />
+          <CustomItem data={JSON.stringify(this.state.curItemCustomValue, null, 2)} extractComponent={this.props.extractComponent}/>
         </Modal>
         <Row type="flex">
           {(layout === 'both' || layout === 'ide') && (

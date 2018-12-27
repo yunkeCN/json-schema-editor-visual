@@ -9,6 +9,8 @@ import {
   Icon,
   Tooltip,
   Switch,
+  Button,
+  message,
 } from 'antd';
 import './schemaJson.css';
 import _ from 'underscore';
@@ -383,12 +385,89 @@ SchemaArray.contextTypes = {
   changeCustomValue: PropTypes.func,
 };
 
-const mapping = data => ({
+class SchemaObject extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      componentName: '',
+      submitStatus: false,
+    }
+    this.extractComponent = this.extractComponent.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (JSON.stringify(this.props.data) !== JSON.stringify(nextProps.data)) {
+      this.setState({
+        componentName: '',
+        submitStatus: false,
+      });
+    }
+  }
+
+  async extractComponent() {
+    if (this.state.componentName === '') {
+      message.success('请输入组件名称');
+      return;
+    }
+
+    this.setState({
+      submitStatus: true
+    });
+
+    const postData = {
+      name: this.state.componentName,
+      body: this.props.data,
+    };
+    const result = await this.props.extractComponent(postData);
+    if (result.data.errcode === 0) {
+      message.success('保存成功');
+    } else {
+      message.error(result.data.errmsg);
+    }
+  }
+
+  render() {
+    if (typeof this.props.extractComponent !== 'function') {
+      return null;
+    }
+
+    return (
+      <div>
+        <div className="default-setting">组件提取</div>
+        <Row className="other-row" type="flex" align="middle">
+          <Col span={4} className="other-label">
+            组件名称：
+          </Col>
+          <Col span={14}>
+            <Input
+              value={this.state.componentName}
+              placeholder="请输入组件名称"
+              onChange={e => {this.setState({componentName: e.target.value})}}
+              disabled={this.state.submitStatus}
+            />
+          </Col>
+          <Col span={6} className="other-label">
+          <Button
+            disabled={this.state.submitStatus}
+            type="primary"
+            onClick={this.extractComponent}
+          >
+            保存为公共组件
+          </Button>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+};
+
+const mapping = (data, extractComponent) => ({
   string: <SchemaString data={data} />,
   number: <SchemaNumber data={data} />,
   boolean: <SchemaBoolean data={data} />,
   integer: <SchemaNumber data={data} />,
   array: <SchemaArray data={data} />,
+  object: <SchemaObject data={data} extractComponent={extractComponent} />,
 }[data.type]);
 
 const handleInputEditor = (e, change) => {
@@ -397,8 +476,8 @@ const handleInputEditor = (e, change) => {
 };
 
 const CustomItem = (props, context) => {
-  const { data } = props;
-  const optionForm = mapping(JSON.parse(data));
+  const { data, extractComponent } = props;
+  const optionForm = mapping(JSON.parse(data), extractComponent);
 
   return (
     <div>
