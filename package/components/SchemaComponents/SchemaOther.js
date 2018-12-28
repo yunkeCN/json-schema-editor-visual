@@ -423,6 +423,9 @@ class SchemaObject extends PureComponent {
       message.success('保存成功');
     } else {
       message.error(result.data.errmsg);
+      this.setState({
+        submitStatus: false
+      });
     }
   }
 

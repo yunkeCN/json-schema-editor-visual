@@ -281,7 +281,14 @@ class SchemaArray extends PureComponent {
             }
             {
               typeof items.$ref !== 'undefined' &&
-              <Col span={5} className="col-item col-item-type" />
+              <Col span={5} className="col-item col-item-type">
+                <Input
+                  type="button"
+                  value="跳转至组件"
+                  addonAfter={<Icon type="right" />}
+                  onClick={() => this.context.redirectToComponentDetails(items.$ref)}
+                />
+              </Col>
             }
             <Col span={3} className="col-item col-item-setting">
               <Tooltip
@@ -311,6 +318,7 @@ class SchemaArray extends PureComponent {
 SchemaArray.contextTypes = {
   getOpenValue: PropTypes.func,
   Model: PropTypes.object,
+  redirectToComponentDetails: PropTypes.func,
 };
 
 class SchemaItem extends PureComponent {
@@ -389,7 +397,7 @@ class SchemaItem extends PureComponent {
   // 展示备注编辑弹窗
   handleShowEdit = () => {
     const { data, name, showEdit } = this.props;
-    showEdit(this.getPrefix(), 'description', data.properties[name].description);
+    showEdit(this.getPrefix(), 'description', (data.properties && data.properties[name] || data).description);
   };
 
   // 展示高级设置弹窗
@@ -566,7 +574,14 @@ class SchemaItem extends PureComponent {
           }
           {
             typeof value.$ref !== 'undefined' &&
-            <Col span={5} className="col-item col-item-type" />
+            <Col span={5} className="col-item col-item-type">
+              <Input
+                type="button"
+                value="跳转至组件"
+                addonAfter={<Icon type="right" />}
+                onClick={() => this.context.redirectToComponentDetails(value.$ref)}
+              />
+            </Col>
           }
           <Col span={3} className="col-item col-item-setting">
             <Icon type="close" className="close delete-item" onClick={this.handleDeleteItem} />
@@ -597,6 +612,7 @@ class SchemaItem extends PureComponent {
 SchemaItem.contextTypes = {
   getOpenValue: PropTypes.func,
   Model: PropTypes.object,
+  redirectToComponentDetails: PropTypes.func,
 };
 
 class SchemaObjectComponent extends Component {

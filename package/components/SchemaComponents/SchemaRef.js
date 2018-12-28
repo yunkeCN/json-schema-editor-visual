@@ -179,7 +179,14 @@ class SchemaRefArray extends PureComponent {
             }
             {
               typeof items.$ref !== 'undefined' &&
-              <Col span={5} className="col-item col-item-type" />
+              <Col span={5} className="col-item col-item-type">
+                <Input
+                  type="button"
+                  value="跳转至组件"
+                  addonAfter={<Icon type="right" />}
+                  onClick={() => this.context.redirectToComponentDetails(items.$ref)}
+                />
+              </Col>
             }
             <Col span={3} className="col-item col-item-setting"></Col>
           </Row>
@@ -193,6 +200,7 @@ class SchemaRefArray extends PureComponent {
 SchemaRefArray.contextTypes = {
   getOpenValue: PropTypes.func,
   Model: PropTypes.object,
+  redirectToComponentDetails: PropTypes.func,
 };
 
 class SchemaRefItem extends PureComponent {
@@ -324,7 +332,14 @@ class SchemaRefItem extends PureComponent {
           }
           {
             typeof value.$ref !== 'undefined' &&
-            <Col span={5} className="col-item col-item-type" />
+            <Col span={5} className="col-item col-item-type">
+              <Input
+                type="button"
+                value="跳转至组件"
+                addonAfter={<Icon type="right" />}
+                onClick={() => this.context.redirectToComponentDetails(value.$ref)}
+              />
+            </Col>
           }
           <Col span={3} className="col-item col-item-setting"></Col>
         </Row>
@@ -337,6 +352,7 @@ class SchemaRefItem extends PureComponent {
 SchemaRefItem.contextTypes = {
   getOpenValue: PropTypes.func,
   Model: PropTypes.object,
+  redirectToComponentDetails: PropTypes.func,
 };
 
 class SchemaRefObjectComponent extends Component {

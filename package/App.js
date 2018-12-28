@@ -4,7 +4,6 @@ import {
   Row,
   Tooltip,
   Col,
-  Form,
   Select,
   Checkbox,
   Button,
@@ -103,6 +102,7 @@ class jsonSchema extends React.Component {
       getOpenValue: keys => utils.getData(this.props.open, keys),
       changeCustomValue: this.changeCustomValue,
       Model: this.props.Model,
+      redirectToComponentDetails: this.props.redirectToComponentDetails,
     };
   }
 
@@ -477,7 +477,14 @@ class jsonSchema extends React.Component {
                 }
                 {
                   typeof this.props.schema.$ref !== 'undefined' &&
-                  <Col span={5} className="col-item col-item-type" />
+                  <Col span={5} className="col-item col-item-type">
+                    <Input
+                      type="button"
+                      value="跳转至组件"
+                      addonAfter={<Icon type="right" />}
+                      onClick={() => this.props.redirectToComponentDetails(this.props.schema.$ref)}
+                    />
+                  </Col>
                 }
                 <Col span={3} className="col-item col-item-setting">
                   <Tooltip
@@ -520,6 +527,7 @@ jsonSchema.childContextTypes = {
   getOpenValue: PropTypes.func,
   changeCustomValue: PropTypes.func,
   Model: PropTypes.object,
+  redirectToComponentDetails: PropTypes.func,
 };
 
 jsonSchema.propTypes = {
@@ -529,11 +537,13 @@ jsonSchema.propTypes = {
   Model: PropTypes.object,
   refSchemas: PropTypes.array,
   refFunc: PropTypes.func,
+  redirectToComponentDetails: PropTypes.func
 };
 
 jsonSchema.defaultProps = {
   refFunc: item => `#components/schema/${item._id}`,
   refSchemas: [],
+  redirectToComponentDetails: () => {},
 };
 
 export default connect(state => ({
