@@ -203,7 +203,9 @@ class SchemaArray extends PureComponent {
         refData2.type = 'object';
         refData2.properties = {};
         refData2.properties.root = refData;
-        subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
+        if (refData) {
+          subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
+        }
       }
     } else {
       subordinate = mapping(prefixArray, items, showEdit, showAdv, refSchemas, refFunc);
@@ -484,7 +486,9 @@ class SchemaItem extends PureComponent {
         refData2.type = 'object';
         refData2.properties = {};
         refData2.properties.root = refData;
-        subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
+        if (refData) {
+          subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
+        }
       }
     } else {
       subordinate = mapping(prefixArray, value, showEdit, showAdv, refSchemas, refFunc);
