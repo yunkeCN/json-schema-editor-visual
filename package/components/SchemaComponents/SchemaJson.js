@@ -624,7 +624,8 @@ class SchemaObjectComponent extends Component {
     if (
       _.isEqual(nextProps.data, this.props.data) &&
       _.isEqual(nextProps.prefix, this.props.prefix) &&
-      _.isEqual(nextProps.open, this.props.open)
+      _.isEqual(nextProps.open, this.props.open) &&
+      nextProps.refSchemas.length === this.props.refSchemas.length
     ) {
       return false;
     }
@@ -663,7 +664,8 @@ class SchemaMixedComponent extends Component {
     if (
       _.isEqual(nextProps.data, this.props.data) &&
       _.isEqual(nextProps.prefix, this.props.prefix) &&
-      _.isEqual(nextProps.open, this.props.open)
+      _.isEqual(nextProps.open, this.props.open) &&
+      nextProps.refSchemas.length === this.props.refSchemas.length
     ) {
       return false;
     }

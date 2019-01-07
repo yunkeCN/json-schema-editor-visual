@@ -450,13 +450,13 @@ class jsonSchema extends React.Component {
                         </Option>
                       ))}
                     </OptGroup>
-                    {/*<OptGroup label="Ref">
+                    <OptGroup label="Ref">
                       {this.props.refSchemas.map(item => (
                         <Option value={`ref:${this.props.refFunc(item)}`} key={item}>
                           {item.name}
                         </Option>
                       ))}
-                      </OptGroup>*/}
+                    </OptGroup>
                   </Select>
                 </Col>
                 {
