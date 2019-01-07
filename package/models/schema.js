@@ -170,10 +170,20 @@ export default {
       let newPropertiesData = [];
       if (name === undefined) {
         newPropertiesData = [].concat(propertiesData);
-        newPropertiesData.push(utils.defaultSchema.string);
+        // newPropertiesData.push(utils.defaultSchema.string);
+        if (keys[keys.length -1] ==='allOf') {
+          newPropertiesData.push(utils.defaultSchema.object);
+        } else {
+          newPropertiesData.push(utils.defaultSchema.string);
+        }
       } else {
         newPropertiesData = [].concat(propertiesData);
-        newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
+        // newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
+        if (keys[keys.length -1] ==='allOf') {
+          newPropertiesData.splice(name + 1, 0, utils.defaultSchema.object);
+        } else {
+          newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
+        }
       }
       utils.setData(state.data, keys, newPropertiesData);
     } else {
