@@ -11,7 +11,7 @@ exports.format = [
   { name: 'uri' },
 ];
 const _ = require('underscore');
-const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
+const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer', 'file'];
 const Combination_Criteria = ['allOf', 'anyOf', 'oneOf', 'not'];
 
 exports.SCHEMA_TYPE = SCHEMA_TYPE;
@@ -38,6 +38,9 @@ exports.defaultSchema = {
   },
   integer: {
     type: 'integer',
+  },
+  file: {
+    type: 'file',
   },
   allOf: {
     allOf: [],
