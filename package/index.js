@@ -35,7 +35,7 @@ module.exports = (config = {}) => {
     render() {
       return (
         <Provider store={store} className="wrapper">
-          <App Model={Model} {...props} />
+          <App Model={Model} {...this.props} />
         </Provider>
       );
     }
