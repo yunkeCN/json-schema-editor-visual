@@ -27,11 +27,19 @@ module.exports = (config = {}) => {
 
   const store = Model.getStore();
 
-  const Component = props => (
-    <Provider store={store} className="wrapper">
-      <App Model={Model} {...props} />
-    </Provider>
-  );
+  class Component extends React.Component {
+    constructor(props) {
+      super(props);
+    }
+
+    render() {
+      return (
+        <Provider store={store} className="wrapper">
+          <App Model={Model} {...props} />
+        </Provider>
+      );
+    }
+  }
 
   Component.propTypes = {
     data: PropTypes.string,

@@ -2,6 +2,7 @@ const JSONPATH_JOIN_CHAR = '.';
 exports.JSONPATH_JOIN_CHAR = JSONPATH_JOIN_CHAR;
 exports.lang = 'en_US';
 exports.format = [
+  { name: 'binary' },
   { name: 'date-time' },
   { name: 'date' },
   { name: 'email' },
@@ -11,7 +12,7 @@ exports.format = [
   { name: 'uri' },
 ];
 const _ = require('underscore');
-const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer', 'file'];
+const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
 const Combination_Criteria = ['allOf', 'anyOf', 'oneOf', 'not'];
 
 exports.SCHEMA_TYPE = SCHEMA_TYPE;
@@ -38,9 +39,6 @@ exports.defaultSchema = {
   },
   integer: {
     type: 'integer',
-  },
-  file: {
-    type: 'file',
   },
   allOf: {
     allOf: [],
