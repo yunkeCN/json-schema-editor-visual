@@ -117,8 +117,13 @@ class SchemaRefArray extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas[i]._id + '') {
-            refData = refSchemas[i].body;
+          if (ref === refSchemas[i].id + '') {
+            const body = refSchemas[i].body;
+            if (typeof body === 'string') {
+              refData = JSON.parse(body);
+            } else {
+              refData = body;
+            }
             break;
           }
         }
@@ -267,8 +272,13 @@ class SchemaRefItem extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas[i]._id + '') {
-            refData = refSchemas[i].body;
+          if (ref === refSchemas[i].id + '') {
+            const body = refSchemas[i].body;
+            if (typeof body === 'string') {
+              refData = JSON.parse(body);
+            } else {
+              refData = body;
+            }
             break;
           }
         }

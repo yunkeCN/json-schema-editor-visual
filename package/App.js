@@ -541,7 +541,7 @@ jsonSchema.propTypes = {
 };
 
 jsonSchema.defaultProps = {
-  refFunc: item => `#components/schema/${item._id}`,
+  refFunc: item => `#components/schema/${item.id}`,
   refSchemas: [],
   redirectToComponentDetails: () => {},
 };
