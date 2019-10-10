@@ -23,9 +23,23 @@ import LocalProvider from '../LocalProvider/index';
 const { TextArea } = Input;
 const { Option } = Select;
 
+const normalizeData = (data, name, value) => {
+  switch(data.type) {
+    case 'number':
+    case 'integer':
+      data[name] = Number(value);
+      break;
+    case 'boolean':
+      data[name] = Boolean(value);
+      break;
+    default:
+      data[name] = value;
+  }
+  return data;
+}
+
 const changeOtherValue = (value, name, data, change) => {
-  data[name] = value;
-  change(data);
+  change(normalizeData(data, name, value));
 };
 
 class SchemaString extends PureComponent {
@@ -46,8 +60,7 @@ class SchemaString extends PureComponent {
   }
 
   changeOtherValue = (value, name, data) => {
-    data[name] = value;
-    this.context.changeCustomValue(data);
+    this.context.changeCustomValue(normalizeData(data, name, value));
   };
 
   changeEnumOtherValue = (value, data) => {
