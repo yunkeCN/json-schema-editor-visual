@@ -22,12 +22,16 @@ import LocalProvider from '../LocalProvider/index';
 
 const { TextArea } = Input;
 const { Option } = Select;
-
+const numberExp = /^\d*(?=\d*)\.?\d+$/;
 const normalizeData = (data, name, value) => {
   switch(data.type) {
     case 'number':
     case 'integer':
-      data[name] = Number(value);
+      if (numberExp.exec(value)) {
+        data[name] = Number(value);
+      } else {
+        data[name] = value;
+      }
       break;
     case 'boolean':
       data[name] = Boolean(value);
