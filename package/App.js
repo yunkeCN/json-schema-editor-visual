@@ -432,9 +432,14 @@ class jsonSchema extends React.Component {
                     className="type-select-style"
                     onChange={this.handleChangeTypeOrRef}
                     value={selectTypeValue}
-                    filterOption={(input, option) => (
-                      option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    )}
+                    filterOption={(input, option) => {
+                      const child = option.props.children;
+                      if (typeof child === 'string') {
+                        return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                      } else {
+                        return false;
+                      }
+                    }}
                   >
                     <OptGroup label="Basic">
                       {SCHEMA_TYPE.map(item => (

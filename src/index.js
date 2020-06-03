@@ -753,7 +753,7 @@ schema = JSON.stringify(schema2, null, '  ');
 
 const refSchemas = [
   {
-    _id: 'user',
+    id: 'user',
     name: 'User',
     body: {
       type: 'object',
@@ -768,7 +768,7 @@ const refSchemas = [
     }
   },
   {
-    _id: 'product',
+    id: 'product',
     name: 'Product',
     body: {
       type: "array",
@@ -778,7 +778,7 @@ const refSchemas = [
     }
   },
   {
-    _id: 'test-01',
+    id: 'test-01',
     name: 'Test-01',
     body: {
       type: 'string',
@@ -786,7 +786,7 @@ const refSchemas = [
     }
   },
   {
-    _id: 'test-02',
+    id: 'test-02',
     name: 'Test-02',
     body: {
       anyOf: [

@@ -182,7 +182,6 @@ class SchemaString extends PureComponent {
               optionFilterProp="children"
               optionLabelProp="value"
               onChange={e => this.changeOtherValue(e, 'format', data)}
-              filterOption={(input, option) => option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
               {this.format.map(item => (
                 <Option value={item.name} key={item.name}>
