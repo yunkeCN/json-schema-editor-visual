@@ -251,7 +251,7 @@ class SchemaArray extends PureComponent {
                 filterOption={(input, option) => {
                   const child = option.props.children;
                   if (typeof child === 'string') {
-                    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                    return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
                   } else {
                     return false;
                   }
@@ -553,7 +553,14 @@ class SchemaItem extends PureComponent {
               className="type-select-style"
               onChange={this.handleChangeTypeOrRef}
               value={typeValue}
-              optionFilterProp="children"
+              filterOption={(input, option) => {
+                const child = option.props.children;
+                if (typeof child === 'string') {
+                  return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                } else {
+                  return false;
+                }
+              }}
             >
               <OptGroup label="Basic">
                 {schemaType.map(item => (

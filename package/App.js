@@ -435,7 +435,7 @@ class jsonSchema extends React.Component {
                     filterOption={(input, option) => {
                       const child = option.props.children;
                       if (typeof child === 'string') {
-                        return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                        return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
                       } else {
                         return false;
                       }
