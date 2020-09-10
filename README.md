@@ -30,8 +30,9 @@ render(
 
 ## SchemaEditor Props
 
-| name         | type     | default | desc               |
-| ------------ | -------- | ------- | ------------------ |
-| `data`       | string   | null    | the data of editor |
-| `onChange`   | function | null    |
-| `showEditor` | boolean  | false   |
+| name            | type     | default          | desc                                      |
+| --------------- | -------- | ---------------- | ----------------------------------------- |
+| `data`          | string   | null             | the data of editor                        |
+| `onChange`      | function | null             |
+| `showEditor`    | boolean  | false            |
+| `WrapComponent` | func     | DefaultComponent | Customize the layout of the header button |
