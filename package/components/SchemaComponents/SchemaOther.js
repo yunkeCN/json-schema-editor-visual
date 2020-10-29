@@ -24,7 +24,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 const numberExp = /^\d*(?=\d*)\.?\d+$/;
 const normalizeData = (data, name, value) => {
-  switch(data.type) {
+  switch (data.type) {
     case 'number':
     case 'integer':
       if (numberExp.exec(value)) {
@@ -421,24 +421,25 @@ class SchemaObject extends PureComponent {
   }
 
   async extractComponent() {
-    if (this.state.componentName === '') {
-      message.success('请输入组件名称');
-      return;
-    }
+    try {
+      if (this.state.componentName === '') {
+        message.success('请输入组件名称');
+        return;
+      }
 
-    this.setState({
-      submitStatus: true
-    });
+      this.setState({
+        submitStatus: true
+      });
 
-    const postData = {
-      name: this.state.componentName,
-      body: this.props.data,
-    };
-    const result = await this.props.extractComponent(postData);
-    if (result.data.errcode === 0) {
+      const postData = {
+        name: this.state.componentName,
+        body: this.props.data,
+      };
+      await this.props.extractComponent(postData);
       message.success('保存成功');
-    } else {
-      message.error(result.data.errmsg);
+    } catch (ex) {
+      message.error(ex.message || ex);
+    } finally {
       this.setState({
         submitStatus: false
       });
@@ -461,17 +462,17 @@ class SchemaObject extends PureComponent {
             <Input
               value={this.state.componentName}
               placeholder="请输入组件名称"
-              onChange={e => {this.setState({componentName: e.target.value})}}
+              onChange={e => { this.setState({ componentName: e.target.value }) }}
               disabled={this.state.submitStatus}
             />
           </Col>
           <Col span={6} className="other-label">
-          <Button
-            disabled={this.state.submitStatus}
-            type="primary"
-            onClick={this.extractComponent}
-          >
-            保存为公共组件
+            <Button
+              disabled={this.state.submitStatus}
+              type="primary"
+              onClick={this.extractComponent}
+            >
+              保存为公共组件
           </Button>
           </Col>
         </Row>
