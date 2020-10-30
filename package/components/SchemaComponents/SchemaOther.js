@@ -468,7 +468,7 @@ class SchemaObject extends PureComponent {
           </Col>
           <Col span={6} className="other-label">
             <Button
-              disabled={this.state.submitStatus}
+              loading={this.state.submitStatus}
               type="primary"
               onClick={this.extractComponent}
             >
