@@ -1,6 +1,6 @@
 {
   "name": "@yued/json-schema-editor-visual",
-  "version": "1.3.14",
+  "version": "1.3.17",
   "description": "jsonschema editor",
   "main": "package/index.js",
   "license": "MIC",
