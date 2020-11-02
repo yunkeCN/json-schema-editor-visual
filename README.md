@@ -1,5 +1,6 @@
 # json-schema-editor-visual
 A json-schema editor of high efficient and easy-to-use, base on React.
+https://github.com/yunkeCN/json-schema-editor-visual
 
 ![avatar](json-schema-editor-visual.jpg)
 
@@ -23,14 +24,15 @@ render(
 
 ## Option Object
 
-| name | desc | default |
-| ---- | ----------- | --------- |
-| `lg` | language, support `en_US` or `zh_CN` | en_US 
+| name | desc                                 | default |
+| ---- | ------------------------------------ | ------- |
+| `lg` | language, support `en_US` or `zh_CN` | en_US   |
 
 ## SchemaEditor Props
 
-| name | type | default | desc
-| ---- | ----------- | --------- | --------- |
-| `data` | string | null | the data of editor
-| `onChange`| function | null | 
-| `showEditor` | boolean | false | 
+| name            | type     | default          | desc                                      |
+| --------------- | -------- | ---------------- | ----------------------------------------- |
+| `data`          | string   | null             | the data of editor                        |
+| `onChange`      | function | null             |
+| `showEditor`    | boolean  | false            |
+| `WrapComponent` | func     | DefaultComponent | Customize the layout of the header button |

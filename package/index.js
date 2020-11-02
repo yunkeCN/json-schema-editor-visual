@@ -27,15 +27,23 @@ module.exports = (config = {}) => {
 
   const store = Model.getStore();
 
+  const DefaultComponent = props => {
+    return (
+      <div>{props.children}</div>
+    )
+  }
+
   class Component extends React.Component {
     constructor(props) {
       super(props);
     }
 
+    WrapComponent = this.props.WrapComponent || DefaultComponent;
+
     render() {
       return (
         <Provider store={store} className="wrapper">
-          <App Model={Model} {...this.props} />
+          <App Model={Model} {...this.props} WrapComponent={this.WrapComponent} />
         </Provider>
       );
     }
@@ -47,6 +55,7 @@ module.exports = (config = {}) => {
     showEditor: PropTypes.bool,
     refSchemas: PropTypes.array,
     refFunc: PropTypes.func,
+    WrapComponent: PropTypes.func,
   };
   return Component;
 };

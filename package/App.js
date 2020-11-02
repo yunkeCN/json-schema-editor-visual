@@ -140,7 +140,7 @@ class jsonSchema extends React.Component {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    } 
+    }
     else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
@@ -298,21 +298,24 @@ class jsonSchema extends React.Component {
       checked,
       layout,
     } = this.state;
+    const { WrapComponent, schema } = this.props;
 
-    const { type } = this.props.schema;
-    const selectTypeValue = this.handleSelectTypeValue(this.props.schema);
+    const { type } = schema;
+    const selectTypeValue = this.handleSelectTypeValue(schema);
     const disabled = !(type === 'object' || type === 'array');
 
     return (
       <div className="json-schema-react-editor">
-        <Radio.Group size="small" value={layout} onChange={this.handleLayoutChange}>
-          <Radio.Button value="ide">IDE</Radio.Button>
-          <Radio.Button value="both">Both</Radio.Button>
-          <Radio.Button value="form">Form</Radio.Button>
-        </Radio.Group>
-        <Button size="small" className="import-json-button" type="primary" onClick={this.showModal}>
-          {LocalProvider('import_json')}
-        </Button>
+        <WrapComponent>
+          <Radio.Group size="small" value={layout} onChange={this.handleLayoutChange}>
+            <Radio.Button value="ide">IDE</Radio.Button>
+            <Radio.Button value="both">Both</Radio.Button>
+            <Radio.Button value="form">Form</Radio.Button>
+          </Radio.Group>
+          <Button size="small" className="import-json-button" type="primary" onClick={this.showModal}>
+            {LocalProvider('import_json')}
+          </Button>
+        </WrapComponent>
         <Modal
           maskClosable={false}
           visible={visible}
@@ -372,7 +375,7 @@ class jsonSchema extends React.Component {
           cancelText={LocalProvider('cancel')}
           className="json-schema-react-editor-adv-modal"
         >
-          <CustomItem data={JSON.stringify(this.state.curItemCustomValue, null, 2)} extractComponent={this.props.extractComponent}/>
+          <CustomItem data={JSON.stringify(this.state.curItemCustomValue, null, 2)} extractComponent={this.props.extractComponent} />
         </Modal>
         <Row type="flex">
           {(layout === 'both' || layout === 'ide') && (
@@ -542,13 +545,14 @@ jsonSchema.propTypes = {
   Model: PropTypes.object,
   refSchemas: PropTypes.array,
   refFunc: PropTypes.func,
-  redirectToComponentDetails: PropTypes.func
+  redirectToComponentDetails: PropTypes.func,
+  WrapComponent: PropTypes.func,
 };
 
 jsonSchema.defaultProps = {
   refFunc: item => `#components/schema/${item.id}`,
   refSchemas: [],
-  redirectToComponentDetails: () => {},
+  redirectToComponentDetails: () => { },
 };
 
 export default connect(state => ({
