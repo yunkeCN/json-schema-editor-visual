@@ -12,14 +12,14 @@ import {
   message,
   Tooltip,
 } from 'antd';
-import './schemaJson.css';
 import _ from 'underscore';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import './schemaJson.css';
 
 import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE, Combination_Criteria, isCombinationCriteria } from '../../utils';
 import LocaleProvider from '../LocalProvider/index';
-import refMapping from './SchemaRef'
+import refMapping from './SchemaRef';
 
 const { Option, OptGroup } = Select;
 
@@ -120,7 +120,7 @@ class SchemaArray extends PureComponent {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
-    } 
+    }
     else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
@@ -190,7 +190,7 @@ class SchemaArray extends PureComponent {
     let subordinate = null;
     if (typeof items.$ref === 'string') {
       let ref = items.$ref.split('/');
-      ref = ref[ref.length -1];
+      ref = ref[ref.length - 1];
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
@@ -232,7 +232,7 @@ class SchemaArray extends PureComponent {
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
                       ) : (
-                        <Icon className="icon-object" type="caret-right" />
+                          <Icon className="icon-object" type="caret-right" />
                         )}
                     </span>
                   ) : null}
@@ -392,7 +392,7 @@ class SchemaItem extends PureComponent {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
-    } 
+    }
     else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
@@ -428,7 +428,7 @@ class SchemaItem extends PureComponent {
   handleClickIcon = () => {
     const { prefix, data, name } = this.props;
     const prefixArray = [].concat(prefix, name);
-    let isCC = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    let isCC = Combination_Criteria.indexOf(prefix[prefix.length - 1]) !== -1;
     const value = isCC ? data : data.properties[name];
 
     if (isCC = isCombinationCriteria(value)) {
@@ -452,13 +452,13 @@ class SchemaItem extends PureComponent {
     const {
       name, data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
-    
+
     const prefixArray = [].concat(prefix, name);
     const prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
     let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     const show = this.context.getOpenValue([prefixStr]);
     let showIcon = this.context.getOpenValue([prefixArrayStr]);
-    const disabled = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    const disabled = Combination_Criteria.indexOf(prefix[prefix.length - 1]) !== -1;
     const value = disabled ? data : data.properties[name];
 
     let isCC = null;
@@ -472,7 +472,7 @@ class SchemaItem extends PureComponent {
     const isShowAddChildNode = showAddChildNode(value);
 
     let schemaType = null;
-    if (prefix[prefix.length -1] === 'allOf') {
+    if (prefix[prefix.length - 1] === 'allOf') {
       schemaType = SCHEMA_TYPE.filter((item) => {
         return item === 'object';
       })
@@ -483,7 +483,7 @@ class SchemaItem extends PureComponent {
     let subordinate = null;
     if (typeof value.$ref === 'string') {
       let ref = value.$ref.split('/');
-      ref = ref[ref.length -1];
+      ref = ref[ref.length - 1];
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
@@ -524,7 +524,7 @@ class SchemaItem extends PureComponent {
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
                     ) : (
-                      <Icon className="icon-object" type="caret-right" />
+                        <Icon className="icon-object" type="caret-right" />
                       )}
                   </span>
                 ) : null}

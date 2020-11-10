@@ -18,21 +18,52 @@ import LocaleProvider from '../LocalProvider/index';
 
 const refMapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   switch (data.type) {
-    case 'array':
-      return <SchemaRefArray prefix={name} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-    case 'object':
+    case 'array': {
+      return (
+        <SchemaRefArray
+          prefix={name}
+          data={data}
+          showEdit={showEdit}
+          showAdv={showAdv}
+          refSchemas={refSchemas}
+          refFunc={refFunc}
+        />
+      );
+    }
+    case 'object': {
       const nameArray = [].concat(name, 'properties');
-      return <SchemaRefObject prefix={nameArray} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-    default:
+      return (
+        <SchemaRefObject
+          prefix={nameArray}
+          data={data}
+          showEdit={showEdit}
+          showAdv={showAdv}
+          refSchemas={refSchemas}
+          refFunc={refFunc}
+        />
+      );
+    }
+    default: {
       let component = null;
+      // eslint-disable-next-line
       for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
         if (Array.isArray(data[Combination_Criteria[i]])) {
           const nameArray = [].concat(name, Combination_Criteria[i]);
-          component = <SchemaRefMixed prefix={nameArray} data={data[Combination_Criteria[i]]} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
+          component = (
+            <SchemaRefMixed
+              prefix={nameArray}
+              data={data[Combination_Criteria[i]]}
+              showEdit={showEdit}
+              showAdv={showAdv}
+              refSchemas={refSchemas}
+              refFunc={refFunc}
+            />
+          );
           break;
         }
       }
       return component;
+    }
   }
 };
 
@@ -113,7 +144,7 @@ class SchemaRefArray extends PureComponent {
     let subordinate = null;
     if (typeof items.$ref === 'string') {
       let ref = items.$ref.split('/');
-      ref = ref[ref.length -1];
+      ref = ref[ref.length - 1];
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
@@ -155,7 +186,7 @@ class SchemaRefArray extends PureComponent {
                       {showIcon ? (
                         <Icon className="icon-object" type="caret-down" />
                       ) : (
-                        <Icon className="icon-object" type="caret-right" />
+                          <Icon className="icon-object" type="caret-right" />
                         )}
                     </span>
                   ) : null}
@@ -233,7 +264,7 @@ class SchemaRefItem extends PureComponent {
   handleClickIcon = () => {
     const { prefix, data, name } = this.props;
     const prefixArray = [].concat(prefix, name);
-    let isCC = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    let isCC = Combination_Criteria.indexOf(prefix[prefix.length - 1]) !== -1;
     const value = isCC ? data : data.properties[name];
 
     if (isCC = isCombinationCriteria(value)) {
@@ -249,13 +280,13 @@ class SchemaRefItem extends PureComponent {
     const {
       name, data, prefix, showEdit, showAdv, refSchemas, refFunc,
     } = this.props;
-    
+
     const prefixArray = [].concat(prefix, name);
     const prefixStr = prefix.join(JSONPATH_JOIN_CHAR);
     let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     const show = this.context.getOpenValue([prefixStr]);
     let showIcon = this.context.getOpenValue([prefixArrayStr]);
-    const disabled = Combination_Criteria.indexOf(prefix[prefix.length -1]) !== -1;
+    const disabled = Combination_Criteria.indexOf(prefix[prefix.length - 1]) !== -1;
     const value = disabled ? data : data.properties[name];
     let isCC = null;
     if (isCC = isCombinationCriteria(value)) {
@@ -268,7 +299,7 @@ class SchemaRefItem extends PureComponent {
     let subordinate = null;
     if (typeof value.$ref === 'string') {
       let ref = value.$ref.split('/');
-      ref = ref[ref.length -1];
+      ref = ref[ref.length - 1];
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
@@ -309,7 +340,7 @@ class SchemaRefItem extends PureComponent {
                     {showIcon ? (
                       <Icon className="icon-object" type="caret-down" />
                     ) : (
-                      <Icon className="icon-object" type="caret-right" />
+                        <Icon className="icon-object" type="caret-right" />
                       )}
                   </span>
                 ) : null}
