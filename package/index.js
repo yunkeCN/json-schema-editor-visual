@@ -27,13 +27,13 @@ module.exports = (config = {}) => {
 
   const store = Model.getStore();
 
-  const DefaultComponent = props => {
+  const DefaultComponent = (props) => {
     return (
       <div>{props.children}</div>
-    )
+    );
   }
 
-  class Component extends React.Component {
+  class CurrentComponent extends React.Component {
     constructor(props) {
       super(props);
     }
@@ -49,7 +49,7 @@ module.exports = (config = {}) => {
     }
   }
 
-  Component.propTypes = {
+  CurrentComponent.propTypes = {
     data: PropTypes.string,
     onChange: PropTypes.func,
     showEditor: PropTypes.bool,
@@ -57,6 +57,6 @@ module.exports = (config = {}) => {
     refFunc: PropTypes.func,
     WrapComponent: PropTypes.func,
   };
-  return Component;
+  return CurrentComponent;
 };
 

@@ -439,9 +439,8 @@ class jsonSchema extends React.Component {
                       const child = option.props.children;
                       if (typeof child === 'string') {
                         return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-                      } else {
-                        return false;
                       }
+                      return false;
                     }}
                   >
                     <OptGroup label="Basic">
@@ -546,6 +545,7 @@ jsonSchema.propTypes = {
   refSchemas: PropTypes.array,
   refFunc: PropTypes.func,
   redirectToComponentDetails: PropTypes.func,
+  schema: PropTypes.object,
   WrapComponent: PropTypes.func,
 };
 
