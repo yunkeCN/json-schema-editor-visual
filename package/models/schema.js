@@ -29,9 +29,7 @@ export default {
   },
 
   changeNameAction(state, action, oldState) {
-    const keys = action.prefix;
-    const name = action.name;
-    const value = action.value;
+    const { prefix: keys, name, value } = action;
     const oldData = oldState.data;
     const parentKeys = utils.getParentKeys(keys);
     const parentData = utils.getData(oldData, parentKeys);
@@ -69,14 +67,14 @@ export default {
   },
 
   changeValueAction(state, action, oldState) {
-    const keys = action.key;
-    const key = keys[keys.length -1];
+    const { key: keys } = action;
+    const key = keys[keys.length - 1];
 
     if (key === '$ref' || utils.Combination_Criteria.indexOf(key) !== -1) {
       const parentKeys = utils.getParentKeys(keys);
       const oldData = oldState.data;
       const parentData = utils.getData(oldData, parentKeys);
-      
+
       const newParentData = {};
       newParentData[key] = action.value;
       for (let field in parentData) {
@@ -84,7 +82,7 @@ export default {
           newParentData[field] = parentData[field];
         }
       }
-      
+
       const newKeys = [].concat('data', parentKeys);
       utils.setData(state, newKeys, newParentData);
     } else {
@@ -93,8 +91,7 @@ export default {
   },
 
   changeTypeAction(state, action, oldState) {
-    const keys = action.key;
-    const { value } = action;
+    const { key: keys, value } = action;
 
     const parentKeys = utils.getParentKeys(keys);
     const oldData = oldState.data;
@@ -111,7 +108,7 @@ export default {
   },
 
   enableRequireAction(state, action, oldState) {
-    const keys = action.prefix;
+    const { prefix: keys } = action;
     const parentKeys = utils.getParentKeys(keys);
     const oldData = oldState.data;
     const parentData = utils.getData(oldData, parentKeys);
@@ -144,7 +141,7 @@ export default {
     const oldData = oldState.data;
     const parentKeys = utils.getParentKeys(keys);
     const parentData = utils.getData(oldData, parentKeys);
-    
+
     if (Array.isArray(parentData)) {
       const newParentData = parentData.slice();
       newParentData.splice(name, 1);
@@ -161,29 +158,17 @@ export default {
   },
 
   addFieldAction(state, action, oldState) {
-    const keys = action.prefix;
-    const oldData = oldState.data;
-    const name = action.name;
-    const propertiesData = utils.getData(oldData, keys);
+    const { prefix: keys, name } = action;
+    const propertiesData = utils.getData(oldState.data, keys);
     const isArray = Array.isArray(propertiesData);
     if (isArray) {
       let newPropertiesData = [];
-      if (name === undefined) {
+      if (!name) {
         newPropertiesData = [].concat(propertiesData);
-        // newPropertiesData.push(utils.defaultSchema.string);
-        if (keys[keys.length -1] ==='allOf') {
-          newPropertiesData.push(utils.defaultSchema.object);
-        } else {
-          newPropertiesData.push(utils.defaultSchema.string);
-        }
+        newPropertiesData.push(utils.defaultSchema.string);
       } else {
         newPropertiesData = [].concat(propertiesData);
-        // newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
-        if (keys[keys.length -1] ==='allOf') {
-          newPropertiesData.splice(name + 1, 0, utils.defaultSchema.object);
-        } else {
-          newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
-        }
+        newPropertiesData.splice(name + 1, 0, utils.defaultSchema.string);
       }
       utils.setData(state.data, keys, newPropertiesData);
     } else {
@@ -203,18 +188,13 @@ export default {
     }
   },
   addChildFieldAction(state, action, oldState) {
-    const keys = action.key;
-    const oldData = oldState.data;
-    const propertiesData = utils.getData(oldData, keys);
+    const { key: keys } = action;
+    const propertiesData = utils.getData(oldState.data, keys);
     const isArray = Array.isArray(propertiesData);
     if (isArray) {
       let newPropertiesData = [];
       newPropertiesData = [].concat(propertiesData);
-      if (keys[keys.length -1] ==='allOf') {
-        newPropertiesData.push(utils.defaultSchema.object);
-      } else {
-        newPropertiesData.push(utils.defaultSchema.string);
-      }
+      newPropertiesData.push(utils.defaultSchema.string);
       utils.setData(state.data, keys, newPropertiesData);
     } else {
       let newPropertiesData = {};

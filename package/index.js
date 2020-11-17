@@ -31,13 +31,9 @@ module.exports = (config = {}) => {
     return (
       <div>{props.children}</div>
     );
-  }
+  };
 
   class CurrentComponent extends React.Component {
-    constructor(props) {
-      super(props);
-    }
-
     WrapComponent = this.props.WrapComponent || DefaultComponent;
 
     render() {

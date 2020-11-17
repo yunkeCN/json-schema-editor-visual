@@ -25,62 +25,109 @@ const { Option, OptGroup } = Select;
 
 const mapping = (name, data, showEdit, showAdv, refSchemas, refFunc) => {
   switch (data.type) {
-    case 'array':
-      return <SchemaArray prefix={name} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-    case 'object':
+    case 'array': {
+      return (
+        <SchemaArray
+          prefix={name}
+          data={data}
+          showEdit={showEdit}
+          showAdv={showAdv}
+          refSchemas={refSchemas}
+          refFunc={refFunc}
+        />
+      );
+    }
+    case 'object': {
       const nameArray = [].concat(name, 'properties');
-      return <SchemaObject prefix={nameArray} data={data} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
-    default:
+      return (
+        <SchemaObject
+          prefix={nameArray}
+          data={data}
+          showEdit={showEdit}
+          showAdv={showAdv}
+          refSchemas={refSchemas}
+          refFunc={refFunc}
+        />
+      );
+    }
+    default: {
       let component = null;
       for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
         if (Array.isArray(data[Combination_Criteria[i]])) {
           const nameArray = [].concat(name, Combination_Criteria[i]);
-          component = <SchemaMixed prefix={nameArray} data={data[Combination_Criteria[i]]} showEdit={showEdit} showAdv={showAdv} refSchemas={refSchemas} refFunc={refFunc} />;
+          component = (
+            <SchemaMixed
+              prefix={nameArray}
+              data={data[Combination_Criteria[i]]}
+              showEdit={showEdit}
+              showAdv={showAdv}
+              refSchemas={refSchemas}
+              refFunc={refFunc}
+            />
+          );
           break;
         }
       }
       return component;
+    }
   }
 };
 
 const handleSelectTypeValue = (schema) => {
-  let value = '';
   if (schema.type !== undefined) {
     return schema.type;
   }
   if (schema.$ref !== undefined) {
     return `ref:${schema.$ref}`;
   }
-  if (value = isCombinationCriteria(schema)) {
-    return value;
+  if (isCombinationCriteria(schema)) {
+    return isCombinationCriteria(schema);
   }
-  return value;
-}
+  return '';
+};
 
-const showDownStyle = (schema) => {
-  let show = false;
+const showDownStyle = (schema, prefix) => {
+  const prefixIsNot = prefix && prefix[prefix.length - 1] === 'not';
+  if (prefixIsNot) {
+    return false;
+  }
   if (schema.type === 'object') {
     return true;
   }
   if (schema.$ref !== undefined) {
     return true;
   }
-  if (show = isCombinationCriteria(schema)) {
-    return !!show;
+  if (isCombinationCriteria(schema)) {
+    return !!isCombinationCriteria(schema);
   }
-  return show;
-}
+  return false;
+};
 
-const showAddChildNode = (schema) => {
-  let show = false;
+const showBrotherNode = (prefix) => {
+  const prefixIsNot = prefix && prefix[prefix.length - 1] === 'not';
+  if (prefixIsNot) {
+    return false;
+  }
+  return true;
+};
+
+const showAddChildNode = (schema, prefix) => {
+  const prefixIsNot = prefix && prefix[prefix.length - 1] === 'not';
+  if (prefixIsNot) {
+    return false;
+  }
   if (schema.type === 'object') {
     return true;
   }
-  if (show = isCombinationCriteria(schema)) {
-    return !!show;
+  const value = isCombinationCriteria(schema);
+  if (isCombinationCriteria(schema)) {
+    if (value === 'not' && schema[value].length >= 1) {
+      return false;
+    }
+    return !!isCombinationCriteria(schema);
   }
-  return show;
-}
+  return false;
+};
 
 class SchemaArray extends PureComponent {
   constructor(props, context) {
@@ -91,7 +138,7 @@ class SchemaArray extends PureComponent {
 
   componentWillMount() {
     const { prefix } = this.props;
-    const length = prefix.filter(name => name != 'properties').length;
+    const { length } = prefix.filter(name => name !== 'properties');
     this.__tagPaddingLeftStyle = {
       paddingLeft: `${20 * (length + 1)}px`,
     };
@@ -115,13 +162,11 @@ class SchemaArray extends PureComponent {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    }
-    else if (Combination_Criteria.indexOf(value) !== -1) {
+    } else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
-    }
-    else {
+    } else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -136,15 +181,16 @@ class SchemaArray extends PureComponent {
 
   // 增加子节点
   handleAddChildField = () => {
-    let prefix = this.getPrefix();
+    const prefix = this.getPrefix();
     let CC = null;
-    let schema = this.props.data.items;
+    const schema = this.props.data.items;
     if (schema.type === 'object') {
-      let keyArr = [].concat(prefix, 'properties');
+      const keyArr = [].concat(prefix, 'properties');
       this.Model.addChildFieldAction({ key: keyArr });
       this.Model.setOpenValueAction({ key: keyArr, value: true });
-    } else if (CC = isCombinationCriteria(schema)) {
-      let keyArr = [].concat(prefix, CC);
+    } else if (isCombinationCriteria(schema)) {
+      CC = isCombinationCriteria(schema);
+      const keyArr = [].concat(prefix, CC);
       this.Model.addChildFieldAction({ key: keyArr });
       this.Model.setOpenValueAction({ key: keyArr, value: true });
     }
@@ -155,7 +201,8 @@ class SchemaArray extends PureComponent {
     const prefix = this.getPrefix();
     let keyArr = [].concat(prefix, 'properties');
     let isCC = null;
-    if (isCC = isCombinationCriteria(data.items)) {
+    if (isCombinationCriteria(data.items)) {
+      isCC = isCombinationCriteria(data.items);
       keyArr = [].concat(prefix, isCC);
     }
     this.Model.setOpenValueAction({ key: keyArr });
@@ -177,12 +224,13 @@ class SchemaArray extends PureComponent {
     const { items } = data;
     const itemTypeValue = handleSelectTypeValue(items);
     const isShowDownStyle = showDownStyle(items);
-    const isShowAddChildNode = showAddChildNode(items);
+    const isShowAddChildNode = showAddChildNode(items, prefix);
     const prefixArray = [].concat(prefix, 'items');
 
     let prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
     let isCC = null;
-    if (isCC = isCombinationCriteria(items)) {
+    if (isCombinationCriteria(items)) {
+      isCC = isCombinationCriteria(items);
       prefixArrayStr = [].concat(prefixArray, isCC).join(JSONPATH_JOIN_CHAR);
     }
     const showIcon = this.context.getOpenValue([prefixArrayStr]);
@@ -194,8 +242,8 @@ class SchemaArray extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas[i].id + '') {
-            const body = refSchemas[i].body;
+          if (ref === `${refSchemas[i].id}`) {
+            const { body } = refSchemas[i];
             if (typeof body === 'string') {
               refData = JSON.parse(body);
             } else {
@@ -204,10 +252,12 @@ class SchemaArray extends PureComponent {
             break;
           }
         }
-        let refData2 = {};
-        refData2.type = 'object';
-        refData2.properties = {};
-        refData2.properties.root = refData;
+        const refData2 = {
+          type: 'object',
+          properties: {
+            root: refData,
+          },
+        };
         if (refData) {
           subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
         }
@@ -252,9 +302,8 @@ class SchemaArray extends PureComponent {
                   const child = option.props.children;
                   if (typeof child === 'string') {
                     return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-                  } else {
-                    return false;
                   }
+                  return false;
                 }}
               >
                 <OptGroup label="Basic">
@@ -331,6 +380,7 @@ SchemaArray.contextTypes = {
   getOpenValue: PropTypes.func,
   Model: PropTypes.object,
   redirectToComponentDetails: PropTypes.func,
+  data: PropTypes.object,
 };
 
 class SchemaItem extends PureComponent {
@@ -343,7 +393,7 @@ class SchemaItem extends PureComponent {
 
   componentWillMount() {
     const { prefix } = this.props;
-    const length = prefix.filter(name => name != 'properties').length;
+    const { length } = prefix.filter(name => name != 'properties');
     this.__tagPaddingLeftStyle = {
       paddingLeft: `${20 * (length + 1)}px`,
     };
@@ -387,13 +437,11 @@ class SchemaItem extends PureComponent {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    }
-    else if (Combination_Criteria.indexOf(value) !== -1) {
+    } else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
-    }
-    else {
+    } else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -418,7 +466,7 @@ class SchemaItem extends PureComponent {
     showAdv(this.getPrefix(), data.properties && data.properties[name] || data);
   };
 
-  //  增加子节点
+  //  增加兄弟节点
   handleAddField = () => {
     const { prefix, name } = this.props;
     this.Model.addFieldAction({ prefix, name });
@@ -431,7 +479,8 @@ class SchemaItem extends PureComponent {
     let isCC = Combination_Criteria.indexOf(prefix[prefix.length - 1]) !== -1;
     const value = isCC ? data : data.properties[name];
 
-    if (isCC = isCombinationCriteria(value)) {
+    if (isCombinationCriteria(value)) {
+      isCC = isCombinationCriteria(value);
       const keyArr = [].concat(prefixArray, isCC);
       this.Model.setOpenValueAction({ key: keyArr });
     } else {
@@ -462,23 +511,17 @@ class SchemaItem extends PureComponent {
     const value = disabled ? data : data.properties[name];
 
     let isCC = null;
-    if (isCC = isCombinationCriteria(value)) {
+    if (isCombinationCriteria(value)) {
+      isCC = isCombinationCriteria(value);
       prefixArrayStr = [].concat(prefixArray, isCC).join(JSONPATH_JOIN_CHAR);
       showIcon = this.context.getOpenValue([prefixArrayStr]);
     }
 
     const typeValue = handleSelectTypeValue(value);
-    const isShowDownStyle = showDownStyle(value);
-    const isShowAddChildNode = showAddChildNode(value);
-
-    let schemaType = null;
-    if (prefix[prefix.length - 1] === 'allOf') {
-      schemaType = SCHEMA_TYPE.filter((item) => {
-        return item === 'object';
-      })
-    } else {
-      schemaType = SCHEMA_TYPE;
-    }
+    const isShowDownStyle = showDownStyle(value, prefix);
+    const isShowBrotherNode = showBrotherNode(prefix);
+    const isShowAddChildNode = showAddChildNode(value, prefix);
+    const isNot = prefix[prefix.length - 1] === 'not';
 
     let subordinate = null;
     if (typeof value.$ref === 'string') {
@@ -487,8 +530,8 @@ class SchemaItem extends PureComponent {
       if (ref !== undefined) {
         let refData = null;
         for (let i = 0, len = refSchemas.length; i < len; i++) {
-          if (ref === refSchemas[i].id + '') {
-            const body = refSchemas[i].body;
+          if (ref === `${refSchemas[i].id}`) {
+            const { body } = refSchemas[i];
             if (typeof body === 'string') {
               refData = JSON.parse(body);
             } else {
@@ -497,10 +540,12 @@ class SchemaItem extends PureComponent {
             break;
           }
         }
-        let refData2 = {};
-        refData2.type = 'object';
-        refData2.properties = {};
-        refData2.properties.root = refData;
+        const refData2 = {
+          type: 'object',
+          properties: {
+            root: refData,
+          },
+        };
         if (refData) {
           subordinate = refMapping(prefixArray, refData2, showEdit, showAdv, refSchemas, refFunc);
         }
@@ -557,32 +602,39 @@ class SchemaItem extends PureComponent {
                 const child = option.props.children;
                 if (typeof child === 'string') {
                   return child.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-                } else {
-                  return false;
                 }
+                return false;
               }}
             >
               <OptGroup label="Basic">
-                {schemaType.map(item => (
+                {SCHEMA_TYPE.map(item => (
                   <Option value={item} key={item}>
                     {item}
                   </Option>
                 ))}
               </OptGroup>
-              <OptGroup label="Combine">
-                {Combination_Criteria.map(item => (
-                  <Option value={item} key={item}>
-                    {item}
-                  </Option>
-                ))}
-              </OptGroup>
-              <OptGroup label="Ref">
-                {refSchemas.map(item => (
-                  <Option value={`ref:${refFunc(item)}`} key={item}>
-                    {item.name}
-                  </Option>
-                ))}
-              </OptGroup>
+              {
+                !isNot && (
+                  <OptGroup label="Combine">
+                    {Combination_Criteria.map(item => (
+                      <Option value={item} key={item}>
+                        {item}
+                      </Option>
+                    ))}
+                  </OptGroup>
+                )
+              }
+              {
+                !isNot && (
+                  <OptGroup label="Ref">
+                    {refSchemas.map(item => (
+                      <Option value={`ref:${refFunc(item)}`} key={item}>
+                        {item.name}
+                      </Option>
+                    ))}
+                  </OptGroup>
+                )
+              }
             </Select>
           </Col>
           {
@@ -615,15 +667,23 @@ class SchemaItem extends PureComponent {
             >
               <Icon onClick={this.handleShowAdv} className="adv-set" type="setting" />
             </Tooltip>
-            {isShowAddChildNode ?
-              <DropPlus prefix={prefix} name={name} schema={value} />
-              :
-              <Tooltip
-                placement="top"
-                title={LocaleProvider('add_sibling_node')}
-              >
-                <Icon onClick={this.handleAddField} type="plus" className="plus" />
-              </Tooltip>
+            {
+              isShowBrotherNode && (
+                isShowAddChildNode
+                  ?
+                  (
+                    <DropPlus prefix={prefix} name={name} schema={value} />
+                  )
+                  :
+                  (
+                    <Tooltip
+                      placement="top"
+                      title={LocaleProvider('add_sibling_node')}
+                    >
+                      <Icon onClick={this.handleAddField} type="plus" className="plus" />
+                    </Tooltip>
+                  )
+              )
             }
           </Col>
         </Row>
@@ -720,7 +780,7 @@ const SchemaMixed = connect(state => ({
 }))(SchemaMixedComponent);
 
 const DropPlus = (props, context) => {
-  const { prefix, name, add, schema } = props;
+  const { prefix, name, schema } = props;
   const Model = context.Model.schema;
 
   const menu = (
@@ -736,7 +796,8 @@ const DropPlus = (props, context) => {
           if (schema.type === 'object') {
             Model.setOpenValueAction({ key: [].concat(prefix, name, 'properties'), value: true });
             Model.addChildFieldAction({ key: [].concat(prefix, name, 'properties') });
-          } else if (CC = isCombinationCriteria(schema)) {
+          } else if (isCombinationCriteria(schema)) {
+            CC = isCombinationCriteria(schema);
             Model.setOpenValueAction({ key: [].concat(prefix, name, CC), value: true });
             Model.addChildFieldAction({ key: [].concat(prefix, name, CC) });
           }

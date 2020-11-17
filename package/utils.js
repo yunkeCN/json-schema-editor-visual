@@ -11,7 +11,6 @@ exports.format = [
   { name: 'ipv6' },
   { name: 'uri' },
 ];
-const _ = require('underscore');
 const SCHEMA_TYPE = ['string', 'number', 'array', 'object', 'boolean', 'integer'];
 const Combination_Criteria = ['allOf', 'anyOf', 'oneOf', 'not'];
 
@@ -56,7 +55,6 @@ exports.defaultSchema = {
 
 // 防抖函数，减少高频触发的函数执行的频率
 // 请在 constructor 里使用:
-
 // this.func = debounce(this.func, 400);
 exports.debounce = (func, wait) => {
   let timeout;
@@ -163,7 +161,8 @@ exports.cloneObject = cloneObject;
 function isCombinationCriteria(schema) {
   let isCC = false;
   for (let i = 0, len = Combination_Criteria.length; i < len; i++) {
-    if (Array.isArray(schema[Combination_Criteria[i]])) {
+    const tag = Combination_Criteria[i];
+    if (Array.isArray(schema[tag])) {
       isCC = Combination_Criteria[i];
       break;
     }

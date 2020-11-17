@@ -140,12 +140,10 @@ class jsonSchema extends React.Component {
     if (isRef) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, '$ref'), value });
-    }
-    else if (Combination_Criteria.indexOf(value) !== -1) {
+    } else if (Combination_Criteria.indexOf(value) !== -1) {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value: undefined });
       this.Model.changeValueAction({ key: [].concat(prefix, value), value: [] });
-    }
-    else {
+    } else {
       this.Model.changeTypeAction({ key: [].concat(prefix, 'type'), value });
     }
   };
@@ -265,17 +263,16 @@ class jsonSchema extends React.Component {
   };
 
   handleSelectTypeValue = (schema) => {
-    let value = '';
     if (schema.type !== undefined) {
       return schema.type;
     }
     if (schema.$ref !== undefined) {
       return `ref:${schema.$ref}`;
     }
-    if (value = isCombinationCriteria(schema)) {
-      return value;
+    if (isCombinationCriteria(schema)) {
+      return isCombinationCriteria(schema);
     }
-    return value;
+    return '';
   }
 
   showDownStyleOrAddChildNode = (schema) => {
